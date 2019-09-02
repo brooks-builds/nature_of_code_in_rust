@@ -17,7 +17,7 @@ impl Game {
 		let mut heights = vec![];
 		let mut colors = vec![];
 		let mut rng = rand::thread_rng();
-		let rectangle_count = 20;
+		let rectangle_count = 100;
 		let (window_width, _window_height) = graphics::drawable_size(context);
 
 		for _ in 0..rectangle_count {
@@ -36,15 +36,31 @@ impl Game {
 			colors
 		}
     }
+
+	fn reset(&mut self) {
+		for index in 0..self.heights.len() {
+			self.heights[index] = 0.0;
+		}
+	}
 }
 
 impl EventHandler for Game {
-    fn update(&mut self, _context: &mut Context) -> GameResult<()> {
+    fn update(&mut self, context: &mut Context) -> GameResult<()> {
 		let mut rng = rand::thread_rng();
 		let rectangle_height = self.heights.choose_mut(&mut rng);
+		let (_window_width, window_height) = graphics::drawable_size(context);
 
 		if let Some(height) = rectangle_height {
 			*height = *height + 1.0;
+		}
+
+		for (index, height) in self.heights.iter().enumerate() {
+			if height > &window_height {
+				println!("{} won the race!", index);
+
+				self.reset();
+				break;
+			}
 		}
 
         Ok(())
