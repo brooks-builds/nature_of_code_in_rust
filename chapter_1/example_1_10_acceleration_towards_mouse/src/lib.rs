@@ -1,6 +1,6 @@
 mod ball;
 
-use ggez::{Context, GameResult, graphics};
+use ggez::{Context, GameResult, graphics, input};
 use ggez::event::EventHandler;
 use ggez::nalgebra::Point2;
 use ball::*;
@@ -26,7 +26,10 @@ impl Game {
 }
 
 impl EventHandler for Game {
-	fn update(&mut self, _context: &mut Context) -> GameResult<()> {
+	fn update(&mut self, context: &mut Context) -> GameResult<()> {
+		let mouse_location = input::mouse::position(context);
+		self.ball.update(mouse_location.into());
+
 		Ok(())
 	}
 
