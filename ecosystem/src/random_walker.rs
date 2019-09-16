@@ -1,12 +1,14 @@
-use ggez::nalgebra::Point2;
+use ggez::nalgebra::{Vector2, Point2};
 use ggez::graphics::{Color, Mesh, MeshBuilder, DrawMode};
 use ggez::{Context, GameResult};
 use rand::prelude::*;
+use crate::Food;
+use std::clone::Clone;
 
 pub struct RandomWalker {
-	location: Point2<f32>,
-	velocity: Point2<f32>,
-	acceleration: Point2<f32>,
+	location: Vector2<f32>,
+	velocity: Vector2<f32>,
+	acceleration: Vector2<f32>,
 	size: f32,
 	color: Color
 }
@@ -17,9 +19,9 @@ impl RandomWalker {
 		let y: f32 = rng.gen_range(0.0, arena_height);
 
 		RandomWalker {
-			location: Point2::new(x, y),
-			velocity: Point2::new(0.0, 0.0),
-			acceleration: Point2::new(0.0, 0.0),
+			location: Vector2::new(x, y),
+			velocity: Vector2::new(0.0, 0.0),
+			acceleration: Vector2::new(0.0, 0.0),
 			size: 10.0,
 			color: Color::from_rgb(255, 255, 255)
 		}
@@ -27,24 +29,23 @@ impl RandomWalker {
 
 	pub fn draw(&mut self, context: &mut Context) -> GameResult<Mesh> {
 		MeshBuilder::new()
-			.circle(DrawMode::fill(), self.location, self.size, 0.01, self.color)
+			.circle(DrawMode::fill(), Point2::from(self.location), self.size, 0.01, self.color)
 			.build(context)
 	}
 
-	pub fn update(&mut self, mut rng: ThreadRng, arena_width: f32, arena_height: f32) {
+	pub fn walk(&mut self, mut rng: ThreadRng, arena_width: f32, arena_height: f32) {
 		self.acceleration.x = rng.gen_range(-0.01, 0.01);
 		self.acceleration.y = rng.gen_range(-0.01, 0.01);
 
-		self.velocity.x = self.velocity.x + self.acceleration.x;
-		self.velocity.y = self.velocity.y + self.acceleration.y;
-
-		self.location.x = self.location.x + self.velocity.x;
-		self.location.y = self.location.y + self.velocity.y;
+		self.velocity = self.velocity + self.acceleration;
+		self.location = self.location + self.velocity;
 
 		self.location.x = self.location.x % arena_width;
 		self.location.y = self.location.y % arena_height;
 
 		self.keep_in_arena(arena_width, arena_height);
+
+		self.size = self.size - 0.01;
 	}
 
 	fn keep_in_arena(&mut self, width: f32, height: f32) {
@@ -58,6 +59,19 @@ impl RandomWalker {
 			self.location.y = height - self.size;
 		} else if self.location.y - self.size < 0.0 {
 			self.location.y = self.size;
+		}
+	}
+
+	pub fn eat(&mut self, foods: &mut Vec<Food>) {
+		for (index, food) in foods.clone().iter().enumerate().rev() {
+			let direction = food.location - self.location;
+			let distance = direction.magnitude();
+
+			if distance <= self.size {
+				self.size = self.size + food.calories;
+				foods.remove(index);
+			}
+
 		}
 	}
 }

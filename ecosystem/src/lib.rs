@@ -22,7 +22,7 @@ impl Game {
 		let mut foods = vec![];
 		let rng = rand::thread_rng();
 
-		for _ in 0..10 {
+		for _ in 0..100 {
 			foods.push(Food::new(window_width, window_height, rng))
 		}
 
@@ -37,8 +37,10 @@ impl Game {
 }
 
 impl EventHandler for Game {
-	fn update(&mut self, context: &mut Context) -> GameResult<()> {
-		self.random_walker.update(self.rng, self.window_width, self.window_height);
+	fn update(&mut self, _context: &mut Context) -> GameResult<()> {
+		self.random_walker.walk(self.rng, self.window_width, self.window_height);
+		self.random_walker.eat(&mut self.foods);
+
 
 		Ok(())
 	}

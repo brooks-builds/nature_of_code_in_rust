@@ -1,13 +1,15 @@
-use ggez::nalgebra::Point2;
+use ggez::nalgebra::{Point2, Vector2};
 use rand::prelude::*;
 use ggez::graphics::{MeshBuilder, DrawMode, Color, Mesh};
 use ggez::{GameResult, Context};
 
+#[derive(Clone)]
 pub struct Food {
-	location: Point2<f32>,
-	calories: f32,
+	pub location: Vector2<f32>,
+	pub calories: f32,
 	size: f32,
-	color: Color
+	color: Color,
+	pub eaten: bool
 }
 
 impl Food {
@@ -15,18 +17,20 @@ impl Food {
 		let x: f32 = rng.gen_range(0.0, width);
 		let y: f32 = rng.gen_range(0.0, height);
 		let color = Color::from_rgb(0, 255, 0);
+		let calories = rng.gen_range(0.1, 5.0);
 
 		Food {
-			calories: 10.0,
-			size: 3.0,
-			location: Point2::new(x, y),
-			color
+			calories,
+			size: calories * 2.0,
+			location: Vector2::new(x, y),
+			color,
+			eaten: false
 		}
 	}
 
 	pub fn draw(&mut self, context: &mut Context) -> GameResult<Mesh> {
 		MeshBuilder::new()
-			.circle(DrawMode::fill(), self.location, self.size, 0.5, self.color)
+			.circle(DrawMode::fill(), Point2::from(self.location), self.size, 0.5, self.color)
 			.build(context)
 	}
 }
