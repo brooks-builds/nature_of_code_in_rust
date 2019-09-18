@@ -10,11 +10,12 @@ pub struct RandomWalker {
 	velocity: Vector2<f32>,
 	acceleration: Vector2<f32>,
 	size: f32,
-	color: Color
+	color: Color,
+	id: u8
 }
 
 impl RandomWalker {
-	pub fn new(arena_width: f32, arena_height: f32, mut rng: ThreadRng) -> RandomWalker {
+	pub fn new(arena_width: f32, arena_height: f32, mut rng: ThreadRng, id: u8) -> RandomWalker {
 		let x: f32 = rng.gen_range(0.0, arena_width);
 		let y: f32 = rng.gen_range(0.0, arena_height);
 
@@ -23,7 +24,8 @@ impl RandomWalker {
 			velocity: Vector2::new(0.0, 0.0),
 			acceleration: Vector2::new(0.0, 0.0),
 			size: 10.0,
-			color: Color::from_rgb(255, 255, 255)
+			color: Color::from_rgb(255, 255, 255),
+			id
 		}
 	}
 
@@ -44,8 +46,6 @@ impl RandomWalker {
 		self.location.y = self.location.y % arena_height;
 
 		self.keep_in_arena(arena_width, arena_height);
-
-		self.size = self.size - 0.01;
 	}
 
 	fn keep_in_arena(&mut self, width: f32, height: f32) {
@@ -73,5 +73,13 @@ impl RandomWalker {
 			}
 
 		}
+	}
+
+	pub fn spend_energy(&mut self) {
+		self.size = self.size - 0.1;
+	}
+
+	pub fn is_dead(&self) -> bool {
+		self.size <= 0.0
 	}
 }

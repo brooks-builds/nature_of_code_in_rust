@@ -16,7 +16,11 @@ impl Food {
 	pub fn new(width: f32, height: f32, mut rng: ThreadRng) -> Food {
 		let x: f32 = rng.gen_range(0.0, width);
 		let y: f32 = rng.gen_range(0.0, height);
-		let color = Color::from_rgb(0, 255, 0);
+		let color = if rand::random() {
+			Color::from_rgb(255, 0, 0)
+		} else {
+			Color::from_rgb(0, 255, 0)
+		};
 		let calories = rng.gen_range(0.1, 5.0);
 
 		Food {
