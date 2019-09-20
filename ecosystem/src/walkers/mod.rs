@@ -20,6 +20,10 @@ impl Walkers {
 	pub fn new(arena_size: (f32, f32), rng: ThreadRng) -> Walkers {
 		Walkers {
 			walkers: vec![
+				Walker::RandomWalker(RandomWalker::new(arena_size.0, arena_size.1, rng)),
+				Walker::RandomWalker(RandomWalker::new(arena_size.0, arena_size.1, rng)),
+				Walker::RandomWalker(RandomWalker::new(arena_size.0, arena_size.1, rng)),
+				Walker::RandomWalker(RandomWalker::new(arena_size.0, arena_size.1, rng)),
 				Walker::RandomWalker(RandomWalker::new(arena_size.0, arena_size.1, rng))
 			]
 		}

@@ -1,7 +1,8 @@
 # Todo
 
 * [x] kill the walker if it runs out of energy
-* [ ] start with less food, but add food every x ticks
+* [x] start with less food
+* [ ] implement a food struct that takes care of adding food every n ticks
 * [ ] use delta time
 * [ ] wrap the screen so walkers are never stuck on the edges
 * [ ] poison food
