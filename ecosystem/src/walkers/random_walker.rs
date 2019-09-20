@@ -3,19 +3,18 @@ use ggez::graphics::{Color, Mesh, MeshBuilder, DrawMode};
 use ggez::{Context, GameResult};
 use rand::prelude::*;
 use crate::Food;
-use std::clone::Clone;
 
+#[derive(Clone, Debug)]
 pub struct RandomWalker {
 	location: Vector2<f32>,
 	velocity: Vector2<f32>,
 	acceleration: Vector2<f32>,
 	size: f32,
-	color: Color,
-	id: u8
+	color: Color
 }
 
 impl RandomWalker {
-	pub fn new(arena_width: f32, arena_height: f32, mut rng: ThreadRng, id: u8) -> RandomWalker {
+	pub fn new(arena_width: f32, arena_height: f32, mut rng: ThreadRng) -> RandomWalker {
 		let x: f32 = rng.gen_range(0.0, arena_width);
 		let y: f32 = rng.gen_range(0.0, arena_height);
 
@@ -24,8 +23,7 @@ impl RandomWalker {
 			velocity: Vector2::new(0.0, 0.0),
 			acceleration: Vector2::new(0.0, 0.0),
 			size: 10.0,
-			color: Color::from_rgb(255, 255, 255),
-			id
+			color: Color::from_rgb(255, 255, 255)
 		}
 	}
 
@@ -79,7 +77,7 @@ impl RandomWalker {
 		self.size = self.size - 0.1;
 	}
 
-	pub fn is_dead(&self) -> bool {
-		self.size <= 0.0
+	pub fn is_alive(&self) -> bool {
+		self.size >= 0.0
 	}
 }

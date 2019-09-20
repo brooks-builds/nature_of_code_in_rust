@@ -1,6 +1,6 @@
 # Todo
 
-* [ ] kill the walker if it runs out of energy
+* [x] kill the walker if it runs out of energy
 * [ ] start with less food, but add food every x ticks
 * [ ] use delta time
 * [ ] wrap the screen so walkers are never stuck on the edges
