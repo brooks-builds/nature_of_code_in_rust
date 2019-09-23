@@ -4,7 +4,8 @@ use ggez::graphics::{Mesh};
 use ggez::{GameResult, Context};
 use random_walker::RandomWalker;
 use rand::prelude::*;
-use crate::Food;
+
+use crate::foods::food::Food;
 
 #[derive(Clone, Debug)]
 enum Walker {

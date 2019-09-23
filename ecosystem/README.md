@@ -2,10 +2,10 @@
 
 * [x] kill the walker if it runs out of energy
 * [x] start with less food
-* [ ] implement a food struct that takes care of adding food every n ticks
+* [x] implement a food struct that takes care of adding food every n ticks
 * [ ] use delta time
 * [ ] wrap the screen so walkers are never stuck on the edges
-* [ ] poison food
+* [ ] poison food (and make blue for red blue color blindness)
 * [ ] different shapes for food types
 
 # Maybe todo

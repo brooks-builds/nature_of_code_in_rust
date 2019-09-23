@@ -2,7 +2,7 @@ use ggez::nalgebra::{Vector2, Point2};
 use ggez::graphics::{Color, Mesh, MeshBuilder, DrawMode};
 use ggez::{Context, GameResult};
 use rand::prelude::*;
-use crate::Food;
+use crate::foods::food::Food;
 
 #[derive(Clone, Debug)]
 pub struct RandomWalker {

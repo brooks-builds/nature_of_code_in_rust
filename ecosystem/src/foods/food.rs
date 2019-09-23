@@ -13,7 +13,7 @@ pub struct Food {
 }
 
 impl Food {
-	pub fn new(width: f32, height: f32, mut rng: ThreadRng) -> Food {
+	pub fn new((width, height): (f32, f32), rng: &mut ThreadRng) -> Food {
 		let x: f32 = rng.gen_range(0.0, width);
 		let y: f32 = rng.gen_range(0.0, height);
 		let color = if rand::random() {

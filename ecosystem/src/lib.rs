@@ -1,34 +1,29 @@
-mod food;
+mod foods;
 mod walkers;
 
 use ggez::{Context, GameResult, graphics, timer};
 use ggez::event::EventHandler;
 use ggez::nalgebra::Point2;
 use rand::prelude::*;
-use food::*;
+use foods::Foods;
 use walkers::Walkers;
 
 pub struct Game {
 	arena_size: (f32, f32),
 	rng: ThreadRng,
-	foods: Vec<Food>,
+	foods: Foods,
 	walkers: Walkers
 }
 
 impl Game {
 	pub fn new(context: &mut Context) -> Game {
 		let arena_size = graphics::drawable_size(context);
-		let mut foods = vec![];
-		let rng = rand::thread_rng();
-
-		for _ in 0..100 {
-			foods.push(Food::new(arena_size.0, arena_size.1, rng))
-		}
+		let mut rng = rand::thread_rng();
 
 		Game {
 			arena_size,
 			rng,
-			foods,
+			foods: Foods::new(arena_size, &mut rng),
 			walkers: Walkers::new(arena_size, rng)
 		}
 	}
@@ -36,7 +31,9 @@ impl Game {
 
 impl EventHandler for Game {
 	fn update(&mut self, context: &mut Context) -> GameResult<()> {
-		self.walkers.update(self.rng, self.arena_size, &mut self.foods, timer::ticks(context));
+		let ticks = timer::ticks(context);
+		self.walkers.update(self.rng, self.arena_size, &mut self.foods.foods, timer::ticks(context));
+		self.foods.update(ticks, self.arena_size, &mut self.rng);
 
 		Ok(())
 	}
@@ -44,10 +41,10 @@ impl EventHandler for Game {
 	fn draw(&mut self, context: &mut Context) -> GameResult<()> {
 		graphics::clear(context, graphics::BLACK);
 
-		for food in &mut self.foods {
-			let food_mesh = food.draw(context)?;
+		for food in self.foods.draw(context) {
+			let food = food?;
 
-			graphics::draw(context, &food_mesh, (Point2::new(0.0, 0.0),))?;
+			graphics::draw(context, &food, (Point2::new(0.0, 0.0),))?;
 		}
 
 		for walker in self.walkers.draw(context) {
