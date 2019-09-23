@@ -43,20 +43,20 @@ impl RandomWalker {
 		self.location.x = self.location.x % arena_width;
 		self.location.y = self.location.y % arena_height;
 
-		self.keep_in_arena(arena_width, arena_height);
+		self.keep_in_arena((arena_width, arena_height));
 	}
 
-	fn keep_in_arena(&mut self, width: f32, height: f32) {
-		if self.location.x + self.size > width {
-			self.location.x = width - self.size;
-		}  else if self.location.x - self.size < 0.0 {
-			self.location.x = self.size;
+	fn keep_in_arena(&mut self, (arena_width, arena_height): (f32, f32)) {
+		if self.location.x - self.size > arena_width {
+			self.location.x = -self.size;
+		}  else if self.location.x + self.size < 0.0 {
+			self.location.x = arena_width - self.size;
 		} 
 
-		if self.location.y + self.size > height {
-			self.location.y = height - self.size;
-		} else if self.location.y - self.size < 0.0 {
-			self.location.y = self.size;
+		if self.location.y - self.size > arena_height {
+			self.location.y = -self.size;
+		} else if self.location.y + self.size < 0.0 {
+			self.location.y = arena_height - self.size;
 		}
 	}
 
