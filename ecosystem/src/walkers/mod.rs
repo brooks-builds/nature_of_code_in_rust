@@ -30,13 +30,13 @@ impl Walkers {
 		}
 	}
 
-	pub fn update(&mut self, rng: ThreadRng, arena_size: (f32, f32), foods: &mut Vec<Food>, ticks: usize) {
+	pub fn update(&mut self, rng: ThreadRng, arena_size: (f32, f32), foods: &mut Vec<Food>, ticks: usize, delta_time: f32) {
 		self.walkers
 			.iter_mut()
 			.for_each(|walker| {
 				match walker {
 					Walker::RandomWalker(walker) => {
-						walker.walk(rng, arena_size.0, arena_size.1);
+						walker.walk(rng, arena_size.0, arena_size.1, delta_time);
 						walker.eat(foods);
 
 						if ticks % 100 == 0 {

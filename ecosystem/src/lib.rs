@@ -31,8 +31,9 @@ impl Game {
 
 impl EventHandler for Game {
 	fn update(&mut self, context: &mut Context) -> GameResult<()> {
+		let delta_time = timer::delta(context).as_nanos() as f32 / 1e9;
 		let ticks = timer::ticks(context);
-		self.walkers.update(self.rng, self.arena_size, &mut self.foods.foods, timer::ticks(context));
+		self.walkers.update(self.rng, self.arena_size, &mut self.foods.foods, timer::ticks(context), delta_time);
 		self.foods.update(ticks, self.arena_size, &mut self.rng);
 
 		Ok(())

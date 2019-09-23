@@ -33,9 +33,9 @@ impl RandomWalker {
 			.build(context)
 	}
 
-	pub fn walk(&mut self, mut rng: ThreadRng, arena_width: f32, arena_height: f32) {
-		self.acceleration.x = rng.gen_range(-0.01, 0.01);
-		self.acceleration.y = rng.gen_range(-0.01, 0.01);
+	pub fn walk(&mut self, mut rng: ThreadRng, arena_width: f32, arena_height: f32, delta_time: f32) {
+		self.acceleration.x = rng.gen_range(-1.0, 1.0) * delta_time;
+		self.acceleration.y = rng.gen_range(-1.0, 1.0) * delta_time;
 
 		self.velocity = self.velocity + self.acceleration;
 		self.location = self.location + self.velocity;
