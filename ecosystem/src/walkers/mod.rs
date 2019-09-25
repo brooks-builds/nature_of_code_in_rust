@@ -38,6 +38,7 @@ impl Walkers {
 					Walker::RandomWalker(walker) => {
 						walker.walk(rng, arena_size.0, arena_size.1, delta_time);
 						walker.eat(foods);
+						walker.cap_size();
 
 						if ticks % 100 == 0 {
 							walker.spend_energy();

@@ -5,7 +5,7 @@
 * [x] implement a food struct that takes care of adding food every n ticks
 * [x] use delta time
 * [x] wrap the screen so walkers are never stuck on the edges
-* [ ] poison food after it ages (and make blue for red green color blindness)
+* [x] poison food after it ages (and make blue for red green color blindness)
 * [ ] different shapes for food types
 
 # Maybe todo

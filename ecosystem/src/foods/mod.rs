@@ -30,6 +30,12 @@ impl Foods {
 		if ticks % self.add_food_after == 0 && self.foods.len() < self.max_food_count {
 			self.foods.push(Food::new(arena_size, rng));
 		}
+
+		for food in &mut self.foods {
+			food.update(ticks);
+		}
+
+		self.foods = self.remove_rotton_food(self.foods.clone());
 	}
 
 	pub fn draw(&mut self, context: &mut Context) -> Vec<GameResult<Mesh>> {
@@ -40,5 +46,9 @@ impl Foods {
 		}
 
 		food_meshes
+	}
+
+	fn remove_rotton_food(&self, foods: Vec<Food>) -> Vec<Food> {
+		foods.into_iter().filter(|food| !food.is_rotton()).collect()
 	}
 }
