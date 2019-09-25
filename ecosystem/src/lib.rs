@@ -42,7 +42,7 @@ impl EventHandler for Game {
 	fn draw(&mut self, context: &mut Context) -> GameResult<()> {
 		graphics::clear(context, graphics::BLACK);
 
-		for food in self.foods.draw(context) {
+		for food in self.foods.draw(context, &mut self.rng) {
 			let food = food?;
 
 			graphics::draw(context, &food, (Point2::new(0.0, 0.0),))?;

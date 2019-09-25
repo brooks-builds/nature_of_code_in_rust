@@ -38,11 +38,11 @@ impl Foods {
 		self.foods = self.remove_rotton_food(self.foods.clone());
 	}
 
-	pub fn draw(&mut self, context: &mut Context) -> Vec<GameResult<Mesh>> {
+	pub fn draw(&mut self, context: &mut Context, rng: &mut ThreadRng) -> Vec<GameResult<Mesh>> {
 		let mut food_meshes = vec![];
 
 		for food in &mut self.foods {
-			food_meshes.push(food.draw(context));
+			food_meshes.push(food.draw(context, rng));
 		}
 
 		food_meshes

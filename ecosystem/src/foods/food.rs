@@ -31,16 +31,31 @@ impl Food {
 		}
 	}
 
-	pub fn draw(&mut self, context: &mut Context) -> GameResult<Mesh> {
+	pub fn draw(&mut self, context: &mut Context, rng: &mut ThreadRng) -> GameResult<Mesh> {
 		let scaled_calories = self.calories * 25.0;
 		let color = if self.calories < 0.0 {
-			Color::from_rgb(100, 10, scaled_calories.abs() as u8)
+			Color::from_rgb(10, 50, scaled_calories.abs() as u8)
 		} else {
 			Color::from_rgb(0, scaled_calories as u8, 0)
 		};
 
+
+		let points = if self.calories > 0.0 {
+			[
+				Point2::new(self.location.x, self.location.y - self.size),
+				Point2::new(self.location.x + self.size, self.location.y + self.size),
+				Point2::new(self.location.x - self.size, self.location.y + self.size)
+			]
+		} else {
+			[
+				Point2::new(self.location.x + rng.gen_range(-5.0, 5.0), self.location.y - self.size),
+				Point2::new(self.location.x + self.size, self.location.y + rng.gen_range(-5.0, 5.0)),
+				Point2::new(self.location.x - self.size, self.location.y + rng.gen_range(-5.0, 5.0))
+			]
+		};
+
 		MeshBuilder::new()
-			.circle(DrawMode::fill(), Point2::from(self.location), self.size, 0.5, color)
+			.polyline(DrawMode::fill(), &points, color)?
 			.build(context)
 	}
 
