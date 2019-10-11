@@ -6,7 +6,11 @@
 * [x] use delta time
 * [x] wrap the screen so walkers are never stuck on the edges
 * [x] poison food after it ages (and make blue for red green color blindness)
-* [ ] different shapes for food types
+* [x] different shapes for food types
+* [ ] use bbggez properly
+* [ ] less poison, more food
+* [ ] Implement window resizing
+* [ ] Add force based walker
 
 # Maybe todo
 
@@ -17,3 +21,4 @@
 * [ ] when wrapping edges, display part of walker on both sides
 * [ ] touching any part of food eats it
 * [ ] reset game when they all die
+* [ ] Poison goes away after some time

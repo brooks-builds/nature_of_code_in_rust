@@ -1,7 +1,11 @@
-use ggez::nalgebra::{Point2, Vector2};
-use rand::prelude::*;
-use ggez::graphics::{MeshBuilder, DrawMode, Color, Mesh};
-use ggez::{GameResult, Context};
+use bbggez::{
+	ggez::nalgebra::{Point2, Vector2},
+	ggez::graphics::{MeshBuilder, DrawMode, Color, Mesh},
+	ggez::{GameResult, Context},
+	Utility,
+	rand,
+	rand::prelude::*,
+};
 
 #[derive(Clone)]
 pub struct Food {
@@ -15,15 +19,11 @@ pub struct Food {
 }
 
 impl Food {
-	pub fn new((width, height): (f32, f32), rng: &mut ThreadRng) -> Food {
-		let x: f32 = rng.gen_range(0.0, width);
-		let y: f32 = rng.gen_range(0.0, height);
-		let calories = 10.0;
-
+	pub fn new((width, height): (f32, f32), utility: &mut Utility) -> Food {
 		Food {
-			calories,
+			calories: 10.0,
 			size: 5.0,
-			location: Vector2::new(x, y),
+			location: utility.random_location(width, height),
 			eaten: false,
 			calorie_loss_rate: 100,
 			calorie_loss_amount: 0.1,
@@ -31,14 +31,14 @@ impl Food {
 		}
 	}
 
-	pub fn draw(&mut self, context: &mut Context, rng: &mut ThreadRng) -> GameResult<Mesh> {
+	pub fn draw(&mut self, context: &mut Context) -> GameResult<Mesh> {
 		let scaled_calories = self.calories * 25.0;
 		let color = if self.calories < 0.0 {
 			Color::from_rgb(10, 50, scaled_calories.abs() as u8)
 		} else {
 			Color::from_rgb(0, scaled_calories as u8, 0)
 		};
-
+		let mut rng = rand::thread_rng();
 
 		let points = if self.calories > 0.0 {
 			[

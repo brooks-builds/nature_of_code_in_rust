@@ -1,7 +1,9 @@
-use ggez::nalgebra::{Vector2, Point2};
-use ggez::graphics::{Color, Mesh, MeshBuilder, DrawMode};
-use ggez::{Context, GameResult};
-use rand::prelude::*;
+use bbggez::{
+	ggez::nalgebra::{Vector2, Point2},
+	ggez::graphics::{Color, Mesh, MeshBuilder, DrawMode},
+	ggez::{Context, GameResult},
+	rand::prelude::*,
+};
 use crate::foods::food::Food;
 
 #[derive(Clone, Debug)]

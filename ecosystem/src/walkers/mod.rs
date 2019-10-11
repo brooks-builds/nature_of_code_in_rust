@@ -1,9 +1,12 @@
 mod random_walker;
 
-use ggez::graphics::{Mesh};
-use ggez::{GameResult, Context};
+use bbggez::{
+	ggez::graphics::{Mesh},
+	ggez::{GameResult, Context},
+	rand,
+	rand::prelude::*
+};
 use random_walker::RandomWalker;
-use rand::prelude::*;
 
 use crate::foods::food::Food;
 
@@ -18,19 +21,15 @@ pub struct Walkers {
 }
 
 impl Walkers {
-	pub fn new(arena_size: (f32, f32), rng: ThreadRng) -> Walkers {
+	pub fn new() -> Walkers {
 		Walkers {
-			walkers: vec![
-				Walker::RandomWalker(RandomWalker::new(arena_size.0, arena_size.1, rng)),
-				Walker::RandomWalker(RandomWalker::new(arena_size.0, arena_size.1, rng)),
-				Walker::RandomWalker(RandomWalker::new(arena_size.0, arena_size.1, rng)),
-				Walker::RandomWalker(RandomWalker::new(arena_size.0, arena_size.1, rng)),
-				Walker::RandomWalker(RandomWalker::new(arena_size.0, arena_size.1, rng))
-			]
+			walkers: vec![],
 		}
 	}
 
-	pub fn update(&mut self, rng: ThreadRng, arena_size: (f32, f32), foods: &mut Vec<Food>, ticks: usize, delta_time: f32) {
+	pub fn update(&mut self, arena_size: (f32, f32), foods: &mut Vec<Food>, ticks: usize, delta_time: f32) {
+		let mut rng = rand::thread_rng();
+
 		self.walkers
 			.iter_mut()
 			.for_each(|walker| {
