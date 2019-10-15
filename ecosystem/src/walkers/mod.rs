@@ -27,21 +27,15 @@ impl Walkers {
 		}
 	}
 
-	pub fn update(&mut self, arena_size: (f32, f32), foods: &mut Vec<Food>, ticks: usize, delta_time: f32) {
-		let mut rng = rand::thread_rng();
+	pub fn update(&mut self, arena_size: (f32, f32), foods: &mut Vec<Food>, ticks: usize, delta_time: f32, context: &mut Context) {
+		let rng = rand::thread_rng();
 
 		self.walkers
 			.iter_mut()
 			.for_each(|walker| {
 				match walker {
 					Walker::RandomWalker(walker) => {
-						walker.walk(rng, arena_size.0, arena_size.1, delta_time);
-						walker.eat(foods);
-						walker.cap_size();
-
-						if ticks % 100 == 0 {
-							walker.spend_energy();
-						}
+						walker.update(arena_size, delta_time, foods, context);
 					}
 				};
 			});
@@ -67,5 +61,11 @@ impl Walkers {
 				}
 			})
 			.collect()
+	}
+
+	pub fn create_walkers(&mut self, arena_size: (f32, f32)) {
+		let walker = Walker::RandomWalker(RandomWalker::new(arena_size));
+
+		self.walkers.push(walker);
 	}
 }

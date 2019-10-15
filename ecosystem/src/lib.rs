@@ -14,6 +14,7 @@ pub struct Game {
 	foods: Foods,
 	walkers: Walkers,
 	utility: Utility,
+	is_first_tick: bool,
 }
 
 impl Game {
@@ -23,6 +24,7 @@ impl Game {
 			foods: Foods::new(),
 			walkers: Walkers::new(),
 			utility: Utility::new(),
+			is_first_tick: true,
 		}
 	}
 }
@@ -32,8 +34,13 @@ impl EventHandler for Game {
 		let delta_time = timer::delta(context).as_nanos() as f32 / 1e9;
 		let ticks = timer::ticks(context);
 		let arena_size = graphics::drawable_size(context);
-		self.walkers.update(arena_size, &mut self.foods.foods, timer::ticks(context), delta_time);
-		self.foods.update(ticks, arena_size, &mut self.utility);
+		self.walkers.update(arena_size, &mut self.foods.foods, timer::ticks(context), delta_time, context);
+		self.foods.update(ticks, arena_size, &mut self.utility, context);
+
+		if self.is_first_tick {
+			self.walkers.create_walkers(arena_size);
+			self.is_first_tick = false;
+		}
 
 		Ok(())
 	}
@@ -42,9 +49,9 @@ impl EventHandler for Game {
 		graphics::clear(context, graphics::BLACK);
 
 		for food in self.foods.draw(context) {
-			let food = food?;
+			let food = food;
 
-			graphics::draw(context, &food, (Point2::new(0.0, 0.0),))?;
+			graphics::draw(context, food, (Point2::new(0.0, 0.0),))?;
 		}
 
 		for walker in self.walkers.draw(context) {

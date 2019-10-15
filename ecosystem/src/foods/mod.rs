@@ -2,43 +2,50 @@ pub mod food;
 
 use food::Food;
 use bbggez::{
-	ggez::{GameResult, Context},
+	ggez::{
+		GameResult, 
+		Context,
+		timer::{duration_to_f64, delta},
+	},
 	ggez::graphics::{Mesh},
 	Utility,
-	rand,
-	rand::prelude::*,
 };
 
 pub struct Foods {
 	pub foods: Vec<Food>,
-	add_food_after: usize,
-	max_food_count: usize
+	add_every_seconds: f64,
+	timer: f64,
+	max_food_count: usize,
 }
 
 impl Foods {
 	pub fn new() -> Foods {
-		let mut foods = vec![];
+		let add_every_seconds = 3.0;
 
 		Foods {
-			foods,
-			add_food_after: 500,
-			max_food_count: 20
+			add_every_seconds,
+			foods: vec![],
+			max_food_count: 20,
+			timer: add_every_seconds,
 		}
 	}
 
-	pub fn update(&mut self, ticks: usize, arena_size: (f32, f32), utility: &mut Utility) {
-		if ticks % self.add_food_after == 0 && self.foods.len() < self.max_food_count {
-			self.foods.push(Food::new(arena_size, utility));
+	pub fn update(&mut self, ticks: usize, arena_size: (f32, f32), utility: &mut Utility, context: &mut Context) {
+		self.timer = self.timer - duration_to_f64(delta(context));
+
+		if self.timer <= 0.0 && self.foods.len() < self.max_food_count {
+			self.foods.push(Food::new(arena_size, utility, context));
+			self.timer = self.add_every_seconds;
 		}
 
 		for food in &mut self.foods {
-			food.update(ticks);
+			food.update(context);
 		}
 
 		self.foods = self.remove_rotton_food(self.foods.clone());
 	}
 
-	pub fn draw(&mut self, context: &mut Context) -> Vec<GameResult<Mesh>> {
+	pub fn draw(&mut self, context: &mut Context) -> Vec<&Mesh> {
 		let mut food_meshes = vec![];
 
 		for food in &mut self.foods {
