@@ -8,6 +8,7 @@ use bbggez::{
 	},
 	rand,
 	rand::prelude::*,
+	Utility,
 };
 use crate::foods::food::Food;
 
@@ -22,17 +23,16 @@ pub struct RandomWalker {
 	rng: ThreadRng,
 	timer: f64,
 	lose_energy_every_seconds: f64,
+	spend_energy_rate: f32,
 }
 
 impl RandomWalker {
-	pub fn new((arena_width, arena_height): (f32, f32)) -> RandomWalker {
+	pub fn new((arena_width, arena_height): (f32, f32), utility: &mut Utility) -> RandomWalker {
 		let mut rng = rand::thread_rng();
-		let x: f32 = rng.gen_range(0.0, arena_width);
-		let y: f32 = rng.gen_range(0.0, arena_height);
 		let lose_energy_every_seconds = 0.3;
 
 		RandomWalker {
-			location: Vector2::new(x, y),
+			location: utility.random_location(arena_width, arena_height),
 			velocity: Vector2::new(0.0, 0.0),
 			acceleration: Vector2::new(0.0, 0.0),
 			size: 10.0,
@@ -41,6 +41,7 @@ impl RandomWalker {
 			rng: rand::thread_rng(),
 			timer: lose_energy_every_seconds,
 			lose_energy_every_seconds,
+			spend_energy_rate: 0.01,
 		}
 	}
 
@@ -91,7 +92,7 @@ impl RandomWalker {
 	}
 
 	pub fn spend_energy(&mut self) {
-		self.size = self.size - 0.1;
+		self.size = self.size - self.spend_energy_rate;
 	}
 
 	pub fn is_alive(&self) -> bool {

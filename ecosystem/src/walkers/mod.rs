@@ -3,8 +3,7 @@ mod random_walker;
 use bbggez::{
 	ggez::graphics::{Mesh},
 	ggez::{GameResult, Context},
-	rand,
-	rand::prelude::*
+	Utility
 };
 use random_walker::RandomWalker;
 
@@ -28,8 +27,6 @@ impl Walkers {
 	}
 
 	pub fn update(&mut self, arena_size: (f32, f32), foods: &mut Vec<Food>, ticks: usize, delta_time: f32, context: &mut Context) {
-		let rng = rand::thread_rng();
-
 		self.walkers
 			.iter_mut()
 			.for_each(|walker| {
@@ -63,8 +60,8 @@ impl Walkers {
 			.collect()
 	}
 
-	pub fn create_walkers(&mut self, arena_size: (f32, f32)) {
-		let walker = Walker::RandomWalker(RandomWalker::new(arena_size));
+	pub fn create_walkers(&mut self, arena_size: (f32, f32), utility: &mut Utility) {
+		let walker = Walker::RandomWalker(RandomWalker::new(arena_size, utility));
 
 		self.walkers.push(walker);
 	}

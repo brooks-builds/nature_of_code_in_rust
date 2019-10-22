@@ -38,7 +38,7 @@ impl EventHandler for Game {
 		self.foods.update(ticks, arena_size, &mut self.utility, context);
 
 		if self.is_first_tick {
-			self.walkers.create_walkers(arena_size);
+			self.walkers.create_walkers(arena_size, &mut self.utility);
 			self.is_first_tick = false;
 		}
 
