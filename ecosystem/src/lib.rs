@@ -27,6 +27,10 @@ impl Game {
 			is_first_tick: true,
 		}
 	}
+
+	fn handle_screen_resizing(&mut self, arena_size: (f32, f32), context: &mut Context) -> GameResult<()> {
+		graphics::set_screen_coordinates(context, graphics::Rect::new(0.0, 0.0, arena_size.0, arena_size.1))
+	}
 }
 
 impl EventHandler for Game {
@@ -38,11 +42,11 @@ impl EventHandler for Game {
 		self.foods.update(ticks, arena_size, &mut self.utility, context);
 
 		if self.is_first_tick {
-			self.walkers.create_walkers(arena_size, &mut self.utility);
+			self.walkers.create_walkers(arena_size, &mut self.utility, context);
 			self.is_first_tick = false;
 		}
 
-		Ok(())
+		self.handle_screen_resizing(arena_size, context)
 	}
 
 	fn draw(&mut self, context: &mut Context) -> GameResult<()> {
@@ -54,10 +58,8 @@ impl EventHandler for Game {
 			graphics::draw(context, food, (Point2::new(0.0, 0.0),))?;
 		}
 
-		for walker in self.walkers.draw(context) {
-			let walker = walker?;
-
-			graphics::draw(context, &walker, (Point2::new(0.0, 0.0),))?;
+		for (mesh, location) in self.walkers.clone() {
+			graphics::draw(context, &mesh, (Point2::from(location),))?;
 		}
 
 		graphics::present(context)

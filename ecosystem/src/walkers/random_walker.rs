@@ -14,20 +14,20 @@ use crate::foods::food::Food;
 
 #[derive(Clone, Debug)]
 pub struct RandomWalker {
-	location: Vector2<f32>,
+	pub location: Vector2<f32>,
 	velocity: Vector2<f32>,
 	acceleration: Vector2<f32>,
 	size: f32,
-	color: Color,
 	max_size: f32,
 	rng: ThreadRng,
 	timer: f64,
 	lose_energy_every_seconds: f64,
 	spend_energy_rate: f32,
+	pub mesh: Mesh,
 }
 
 impl RandomWalker {
-	pub fn new((arena_width, arena_height): (f32, f32), utility: &mut Utility) -> RandomWalker {
+	pub fn new((arena_width, arena_height): (f32, f32), utility: &mut Utility, context: &mut Context, size: f32) -> RandomWalker {
 		let mut rng = rand::thread_rng();
 		let lose_energy_every_seconds = 0.3;
 
@@ -35,20 +35,14 @@ impl RandomWalker {
 			location: utility.random_location(arena_width, arena_height),
 			velocity: Vector2::new(0.0, 0.0),
 			acceleration: Vector2::new(0.0, 0.0),
-			size: 10.0,
-			color: Color::from_rgb(255, 255, 255),
+			size,
 			max_size: 25.0,
 			rng: rand::thread_rng(),
 			timer: lose_energy_every_seconds,
 			lose_energy_every_seconds,
 			spend_energy_rate: 0.01,
+			mesh: utility.create_circle(0.0, 0.0, size, Color::from_rgb(255, 255, 255), context)
 		}
-	}
-
-	pub fn draw(&mut self, context: &mut Context) -> GameResult<Mesh> {
-		MeshBuilder::new()
-			.circle(DrawMode::fill(), Point2::from(self.location), self.size, 0.01, self.color)
-			.build(context)
 	}
 
 	pub fn walk(&mut self, (arena_width, arena_height): (f32, f32), delta_time: f32) {
