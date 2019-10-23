@@ -7,10 +7,11 @@
 * [x] wrap the screen so walkers are never stuck on the edges
 * [x] poison food after it ages (and make blue for red green color blindness)
 * [x] different shapes for food types
-* [ ] use bbggez properly
-* [ ] less poison, more food
-* [ ] Implement window resizing
+* [x] use bbggez properly
+* [x] less poison, more food
+* [x] Implement window resizing
 * [ ] Add force based walker
+* [ ] Refactor for dry
 
 # Maybe todo
 

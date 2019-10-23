@@ -3,9 +3,10 @@ mod attraction_walker;
 
 use bbggez::{
 	ggez::{
-		graphics::Mesh,
+		graphics,
 		Context,
-		nalgebra::Vector2,
+		nalgebra::{Point2},
+		mint,
 	},
 	Utility
 };
@@ -78,29 +79,51 @@ impl Walkers {
 	// 		.collect()
 	// }
 
+	pub fn draw(&mut self, context: &mut Context) {
+		for walker in &self.walkers {
+
+			match walker {
+				Walker::RandomWalker(walker) => {
+					let mut params = graphics::DrawParam::new();
+
+					params.dest = mint::Point2{x: walker.location.x, y: walker.location.y};
+					params.scale = mint::Vector2 {x: walker.size, y: walker.size};
+					graphics::draw(context, &walker.mesh, params).unwrap();
+				},
+				Walker::AttractionWalker(walker) => {
+					let mut params = graphics::DrawParam::new();
+
+					params.dest = mint::Point2 {x: walker.location.x, y: walker.location.y};
+					graphics::draw(context, &walker.mesh, params).unwrap()
+				},
+			};
+		}
+	}
+
 	pub fn create_walkers(&mut self, arena_size: (f32, f32), utility: &mut Utility, context: &mut Context) {
 		self.walkers.push(Walker::RandomWalker(RandomWalker::new(arena_size, utility, context, self.starting_sizes)));
 		self.walkers.push(Walker::AttractionWalker(AttractionWalker::new(utility.random_location(arena_size.0, arena_size.1), self.starting_sizes, self.walker_speed, utility, context)));
 	}
 }
 
-impl Iterator for Walkers {
-	type Item = (Mesh, Vector2<f32>);
+// impl Iterator for Walkers {
+// 	type Item = (Mesh, Vector2<f32>, String);
 
-	fn next(&mut self) -> Option<(Mesh, Vector2<f32>)> {
-		let current_walker = self.walkers[self.iterator_index].clone();
+// 	fn next(&mut self) -> Option<(Mesh, Vector2<f32>, String)> {
+// 		let current_walker = self.walkers[self.iterator_index].clone();
+// 		dbg!(&current_walker);
 
-		self.iterator_index = self.iterator_index + 1;
+// 		self.iterator_index = self.iterator_index + 1;
 
-		if self.iterator_index >= self.walkers.len() {
-			self.iterator_index = 0;
-			None
-		} else {
-			match current_walker {
-				Walker::RandomWalker(walker) => Some((walker.mesh, walker.location)),
-				Walker::AttractionWalker(walker) => Some((walker.mesh, walker.location)),
-			}
-		}
+// 		if self.iterator_index >= self.walkers.len() {
+// 			self.iterator_index = 0;
+// 			None
+// 		} else {
+// 			match current_walker {
+// 				Walker::RandomWalker(walker) => Some((walker.mesh, walker.location, walker.name)),
+// 				Walker::AttractionWalker(walker) => Some((walker.mesh, walker.location, walker.name)),
+// 			}
+// 		}
 
-	}
-}
+// 	}
+// }

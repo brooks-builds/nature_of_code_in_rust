@@ -58,9 +58,12 @@ impl EventHandler for Game {
 			graphics::draw(context, food, (Point2::new(0.0, 0.0),))?;
 		}
 
-		for (mesh, location) in self.walkers.clone() {
-			graphics::draw(context, &mesh, (Point2::from(location),))?;
-		}
+		self.walkers.draw(context);
+
+		// for (mesh, location, _name) in self.walkers.clone() {
+		// 	// dbg!(name);
+		// 	graphics::draw(context, &mesh, (Point2::from(location),))?;
+		// }
 
 		graphics::present(context)
 	}

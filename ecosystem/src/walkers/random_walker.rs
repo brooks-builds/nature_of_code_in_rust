@@ -17,13 +17,14 @@ pub struct RandomWalker {
 	pub location: Vector2<f32>,
 	velocity: Vector2<f32>,
 	acceleration: Vector2<f32>,
-	size: f32,
+	pub size: f32,
 	max_size: f32,
 	rng: ThreadRng,
 	timer: f64,
 	lose_energy_every_seconds: f64,
 	spend_energy_rate: f32,
 	pub mesh: Mesh,
+	pub name: String,
 }
 
 impl RandomWalker {
@@ -41,7 +42,8 @@ impl RandomWalker {
 			timer: lose_energy_every_seconds,
 			lose_energy_every_seconds,
 			spend_energy_rate: 0.01,
-			mesh: utility.create_circle(0.0, 0.0, size, Color::from_rgb(255, 255, 255), context)
+			mesh: utility.create_circle(0.0, 0.0, 1.0, Color::from_rgb(255, 255, 255), context),
+			name: String::from("random walker"),
 		}
 	}
 

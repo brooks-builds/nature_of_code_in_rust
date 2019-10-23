@@ -17,7 +17,8 @@ pub struct AttractionWalker {
 	velocity: Vector2<f32>,
 	speed: f32,
 	size: f32,
-	pub mesh: Mesh
+	pub mesh: Mesh,
+	pub name: String,
 }
 
 impl AttractionWalker {
@@ -29,6 +30,7 @@ impl AttractionWalker {
 			speed,
 			size,
 			mesh: utility.create_circle(0.0, 0.0, size, Color::new(1.0, 1.0, 0.0, 1.0), context),
+			name: String::from("attraction walker"),
 		}
 	}
 
