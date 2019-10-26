@@ -47,7 +47,7 @@ impl Walkers {
 					Walker::RandomWalker(walker) => {
 						walker.update(arena_size, delta_time, foods, context);
 					},
-					Walker::AttractionWalker(walker) => walker.update(),
+					Walker::AttractionWalker(walker) => walker.update(foods, delta_time),
 				};
 			});
 
@@ -94,6 +94,7 @@ impl Walkers {
 					let mut params = graphics::DrawParam::new();
 
 					params.dest = mint::Point2 {x: walker.location.x, y: walker.location.y};
+					params.scale = walker.get_scale();
 					graphics::draw(context, &walker.mesh, params).unwrap()
 				},
 			};
@@ -102,7 +103,7 @@ impl Walkers {
 
 	pub fn create_walkers(&mut self, arena_size: (f32, f32), utility: &mut Utility, context: &mut Context) {
 		self.walkers.push(Walker::RandomWalker(RandomWalker::new(arena_size, utility, context, self.starting_sizes)));
-		self.walkers.push(Walker::AttractionWalker(AttractionWalker::new(utility.random_location(arena_size.0, arena_size.1), self.starting_sizes, self.walker_speed, utility, context)));
+		self.walkers.push(Walker::AttractionWalker(AttractionWalker::new(utility.random_location(arena_size.0, arena_size.1), utility, context)));
 	}
 }
 

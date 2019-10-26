@@ -8,7 +8,7 @@ use bbggez::{
 	Utility,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Food {
 	pub location: Vector2<f32>,
 	pub calories: f32,

@@ -11,7 +11,9 @@
 * [x] less poison, more food
 * [x] Implement window resizing
 * [ ] Add force based walker
+* [ ] Walkers can eat eachother
 * [ ] Refactor for dry
+* [ ] Create screenshots for thumbnails
 
 # Maybe todo
 
