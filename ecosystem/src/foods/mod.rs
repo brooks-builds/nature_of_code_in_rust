@@ -16,17 +16,19 @@ pub struct Foods {
 	add_every_seconds: f64,
 	timer: f64,
 	max_food_count: usize,
+	next_id: usize,
 }
 
 impl Foods {
 	pub fn new() -> Foods {
-		let add_every_seconds = 3.0;
+		let add_every_seconds = 1.0;
 
 		Foods {
 			add_every_seconds,
 			foods: vec![],
 			max_food_count: 20,
 			timer: add_every_seconds,
+			next_id: 0,
 		}
 	}
 
@@ -34,7 +36,8 @@ impl Foods {
 		self.timer = self.timer - duration_to_f64(delta(context));
 
 		if self.timer <= 0.0 && self.foods.len() < self.max_food_count {
-			self.foods.push(Food::new(arena_size, utility, context));
+			self.foods.push(Food::new(arena_size, utility, context, self.next_id));
+			self.next_id = self.next_id + 1;
 			self.timer = self.add_every_seconds;
 		}
 

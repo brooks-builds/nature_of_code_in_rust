@@ -6,9 +6,11 @@ use bbggez::{
 			Mesh,
 		},
 		Context,
-		mint,
+		timer::{duration_to_f64, delta},
 	},
 	Utility,
+	rand,
+	rand::prelude::*,
 };
 
 use crate::foods::food::Food;
@@ -19,38 +21,47 @@ pub struct AttractionWalker {
 	acceleration: Vector2<f32>,
 	velocity: Vector2<f32>,
 	speed: f32,
-	health: f32,
+	pub health: f32,
 	initial_health: f32,
 	pub mesh: Mesh,
 	pub name: String,
 	energy_spend_rate: f32,
 	friction: f32,
+	timer: f64,
+	lose_energy_every_seconds: f64,
+	cached_target: Option<usize>,
+	rng: ThreadRng,
 }
 
 impl AttractionWalker {
 	pub fn new(location: Vector2<f32>, utility: &mut Utility, context: &mut Context) -> AttractionWalker {
 		let initial_health = 10.0;
+		let lose_energy_every_seconds = 0.1;
+		let mut rng = rand::thread_rng();
 
 		AttractionWalker {
 			location,
 			acceleration: Vector2::new(0.0, 0.0),
 			velocity: Vector2::new(0.0, 0.0),
-			speed: 0.2,
+			speed: 0.1,
 			initial_health,
 			health: initial_health,
-			mesh: utility.create_circle(0.0, 0.0, 10.0, Color::new(1.0, 1.0, 0.0, 1.0), context),
+			mesh: utility.create_circle(0.0, 0.0, 1.0, Color::new(1.0, 1.0, 0.0, 1.0), context),
 			name: String::from("attraction walker"),
-			energy_spend_rate: 0.0000001,
+			energy_spend_rate: 0.05,
 			friction: 0.0001,
+			timer: lose_energy_every_seconds,
+			lose_energy_every_seconds,
+			cached_target: None,
+			rng,
 		}
 	}
 
-	pub fn update(&mut self, foods: &Vec<Food>, delta_time: f32) {
+	pub fn update(&mut self, foods: &Vec<Food>, delta_time: f32, context: &mut Context) {
 		let target = self.choose_target(foods);
 
 		if let Some(target) = target {
 			self.move_towards(target, delta_time);
-			self.spend_energy();
 		}
 		
 		self.slow_down();
@@ -60,26 +71,41 @@ impl AttractionWalker {
 		// eat food
 		// wrap around screen
 		self.acceleration = self.acceleration * 0.0;
+
+		self.timer = self.timer - duration_to_f64(delta(context));
+		if self.timer < 0.0 {
+			self.spend_energy();
+			self.timer = self.lose_energy_every_seconds;
+		}
 	}
 
 	pub fn is_alive(&self) -> bool {
 		self.health >= 0.0
 	}
 
-	fn choose_target<'a>(&self, foods: &'a Vec<Food>) -> Option<&'a Food> {
-		for food in foods {
-			if !food.is_rotton() {
-				return Some(&food);
+	fn choose_target<'a>(&mut self, foods: &'a Vec<Food>) -> Option<&'a Food> {
+		if let Some(id) = self.cached_target {
+			for food in foods {
+				if food.id == id {
+					 return Some(&food);
+				}
 			}
-		}
 
-		None
+			self.cached_target = None;
+			return None;
+		} else if foods.len() == 0 {
+			return None;
+		} else {
+			return Some(&foods[self.rng.gen_range(0, foods.len())]);
+		}
 	}
 
 	fn move_towards(&mut self, food: &Food, delta_time: f32) {
 		let mut direction = food.location - self.location;
 		
-		direction = direction.normalize();
+		if direction.x != 0.0 && direction.y != 0.0 {
+			direction = direction.normalize();
+		}
 
 		let force = direction * (self.speed * delta_time);
 
@@ -107,14 +133,7 @@ impl AttractionWalker {
 	}
 
 	fn is_standing_still(&self) -> bool {
-		self.velocity.x == 0.0 && self.velocity.y == 0.0
-	}
-
-	pub fn get_scale(&self) -> mint::Vector2<f32> {
-		mint::Vector2{
-			x: self.health / self.initial_health,
-			y: self.health / self.initial_health,
-		}
+		self.velocity.x.abs() < 0.00000000001 && self.velocity.y.abs() < 0.00000000001
 	}
 
 	fn cap_velocity(&mut self) {
@@ -128,6 +147,19 @@ impl AttractionWalker {
 			self.velocity.y = -1.0;
 		} else if self.velocity.y > 1.0 {
 			self.velocity.y = 1.0;
+		}
+	}
+
+	pub fn eat(&mut self, foods: &mut Vec<Food>) {
+		for (index, food) in foods.clone().iter().enumerate().rev() {
+			let direction = food.location - self.location;
+			let distance = direction.magnitude();
+
+			if distance <= self.health {
+				self.health = self.health + food.calories;
+				foods.remove(index);
+			}
+
 		}
 	}
 }

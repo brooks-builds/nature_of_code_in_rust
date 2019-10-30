@@ -10,7 +10,7 @@
 * [x] use bbggez properly
 * [x] less poison, more food
 * [x] Implement window resizing
-* [ ] Add force based walker
+* [ ] Add force based walker - walkers are being attracted to all foods instead of just some foods
 * [ ] Walkers can eat eachother
 * [ ] Refactor for dry
 * [ ] Create screenshots for thumbnails

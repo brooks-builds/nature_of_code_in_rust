@@ -20,10 +20,11 @@ pub struct Food {
 	minimum_calories: f32,
 	healthy_mesh: Mesh,
 	poison_mesh: Mesh,
+	pub id: usize,
 }
 
 impl Food {
-	pub fn new((width, height): (f32, f32), utility: &mut Utility, context: &mut Context) -> Food {
+	pub fn new((width, height): (f32, f32), utility: &mut Utility, context: &mut Context, id: usize) -> Food {
 		let location = utility.random_location(width, height);
 		let size = 15.0;
 		let healthy_color = Color::new(0.0, 1.0, 0.0, 1.0);
@@ -41,6 +42,7 @@ impl Food {
 			minimum_calories: -10.0,
 			healthy_mesh: utility.create_equilateral_triangle(location.x, location.y, size, healthy_color, context),
 			poison_mesh: utility.create_square(location.x, location.y, size, poison_color, context),
+			id
 		}
 	}
 

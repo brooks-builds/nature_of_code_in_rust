@@ -4,9 +4,11 @@ mod attraction_walker;
 use bbggez::{
 	ggez::{
 		graphics,
+		graphics::{DrawParam, Scale},
 		Context,
 		nalgebra::{Point2},
 		mint,
+		GameResult,
 	},
 	Utility
 };
@@ -47,7 +49,10 @@ impl Walkers {
 					Walker::RandomWalker(walker) => {
 						walker.update(arena_size, delta_time, foods, context);
 					},
-					Walker::AttractionWalker(walker) => walker.update(foods, delta_time),
+					Walker::AttractionWalker(walker) => {
+						walker.update(foods, delta_time, context);
+						walker.eat(foods);
+					},
 				};
 			});
 
@@ -79,31 +84,35 @@ impl Walkers {
 	// 		.collect()
 	// }
 
-	pub fn draw(&mut self, context: &mut Context) {
+	pub fn draw(&mut self, context: &mut Context) -> GameResult<()> {
 		for walker in &self.walkers {
 
 			match walker {
 				Walker::RandomWalker(walker) => {
-					let mut params = graphics::DrawParam::new();
-
-					params.dest = mint::Point2{x: walker.location.x, y: walker.location.y};
-					params.scale = mint::Vector2 {x: walker.size, y: walker.size};
-					graphics::draw(context, &walker.mesh, params).unwrap();
+					graphics::draw(
+						context, 
+						&walker.mesh, 
+						DrawParam::default().dest(Point2::from(walker.location)).scale([walker.size, walker.size]),
+					)?;
 				},
 				Walker::AttractionWalker(walker) => {
-					let mut params = graphics::DrawParam::new();
-
-					params.dest = mint::Point2 {x: walker.location.x, y: walker.location.y};
-					params.scale = walker.get_scale();
-					graphics::draw(context, &walker.mesh, params).unwrap()
+					graphics::draw(
+						context, 
+						&walker.mesh, 
+						DrawParam::default().dest(Point2::from(walker.location)).scale([walker.health, walker.health]),
+					)?;
 				},
-			};
+			}
 		}
+
+		Ok(())
 	}
 
 	pub fn create_walkers(&mut self, arena_size: (f32, f32), utility: &mut Utility, context: &mut Context) {
-		self.walkers.push(Walker::RandomWalker(RandomWalker::new(arena_size, utility, context, self.starting_sizes)));
-		self.walkers.push(Walker::AttractionWalker(AttractionWalker::new(utility.random_location(arena_size.0, arena_size.1), utility, context)));
+		for _ in 0..5 {
+			self.walkers.push(Walker::RandomWalker(RandomWalker::new(arena_size, utility, context)));
+			self.walkers.push(Walker::AttractionWalker(AttractionWalker::new(utility.random_location(arena_size.0, arena_size.1), utility, context)));
+		}
 	}
 }
 
