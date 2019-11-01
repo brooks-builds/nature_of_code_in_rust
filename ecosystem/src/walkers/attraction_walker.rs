@@ -13,6 +13,7 @@ use bbggez::{
 	rand::prelude::*,
 };
 
+use crate::Foods;
 use crate::foods::food::Food;
 
 #[derive(Clone, Debug)]
@@ -43,13 +44,13 @@ impl AttractionWalker {
 			location,
 			acceleration: Vector2::new(0.0, 0.0),
 			velocity: Vector2::new(0.0, 0.0),
-			speed: 0.1,
+			speed: 2.3,
 			initial_health,
 			health: initial_health,
 			mesh: utility.create_circle(0.0, 0.0, 1.0, Color::new(1.0, 1.0, 0.0, 1.0), context),
 			name: String::from("attraction walker"),
 			energy_spend_rate: 0.05,
-			friction: 0.0001,
+			friction: 0.0005,
 			timer: lose_energy_every_seconds,
 			lose_energy_every_seconds,
 			cached_target: None,
@@ -57,10 +58,10 @@ impl AttractionWalker {
 		}
 	}
 
-	pub fn update(&mut self, foods: &Vec<Food>, delta_time: f32, context: &mut Context) {
+	pub fn update(&mut self, foods: &mut Foods, delta_time: f32, context: &mut Context) {
 		let target = self.choose_target(foods);
 
-		if let Some(target) = target {
+		if let Some(target) = target.as_ref() {
 			self.move_towards(target, delta_time);
 		}
 		
@@ -83,20 +84,32 @@ impl AttractionWalker {
 		self.health >= 0.0
 	}
 
-	fn choose_target<'a>(&mut self, foods: &'a Vec<Food>) -> Option<&'a Food> {
-		if let Some(id) = self.cached_target {
-			for food in foods {
-				if food.id == id {
-					 return Some(&food);
-				}
-			}
+	fn choose_target<'a>(&mut self, food_controller: &'a mut Foods) -> Option<&'a Food> {
+		// if let Some(id) = self.cached_target {
+		// 	for food in foods {
+		// 		if food.id == id {
+		// 			 return Some(&food);
+		// 		}
+		// 	}
 
-			self.cached_target = None;
-			return None;
-		} else if foods.len() == 0 {
-			return None;
+		// 	self.cached_target = None;
+		// 	return None;
+		// } else if foods.len() == 0 {
+		// 	return None;
+		// } else {
+		// 	return Some(&foods[self.rng.gen_range(0, foods.len())]);
+		// }
+
+		if let Some(food_id) = self.cached_target {
+			if food_controller.id_exists(food_id) {
+				return food_controller.get_food_by_id(food_id);
+			} else {
+				self.cached_target = None;
+				return None;
+			}
 		} else {
-			return Some(&foods[self.rng.gen_range(0, foods.len())]);
+			self.cached_target = food_controller.random_id();
+			return None;
 		}
 	}
 

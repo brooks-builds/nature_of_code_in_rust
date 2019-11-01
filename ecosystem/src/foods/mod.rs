@@ -9,6 +9,8 @@ use bbggez::{
 	},
 	ggez::graphics::{Mesh},
 	Utility,
+	rand,
+	rand::prelude::*,
 };
 
 pub struct Foods {
@@ -17,6 +19,7 @@ pub struct Foods {
 	timer: f64,
 	max_food_count: usize,
 	next_id: usize,
+	rng: ThreadRng,
 }
 
 impl Foods {
@@ -29,6 +32,7 @@ impl Foods {
 			max_food_count: 20,
 			timer: add_every_seconds,
 			next_id: 0,
+			rng: rand::thread_rng(),
 		}
 	}
 
@@ -60,5 +64,35 @@ impl Foods {
 
 	fn remove_rotton_food(&self, foods: Vec<Food>) -> Vec<Food> {
 		foods.into_iter().filter(|food| !food.is_rotton()).collect()
+	}
+
+	pub fn id_exists(&self, id: usize) -> bool {
+		for food in &self.foods {
+			if food.id == id {
+				return true;
+			}
+		}
+
+		false
+	}
+
+	pub fn get_food_by_id(&self, id: usize) -> Option<&Food> {
+		for food in &self.foods {
+			if food.id == id {
+				return Some(food);
+			}
+		}
+
+		None
+	}
+
+	pub fn random_id(&mut self) -> Option<usize> {
+		if self.foods.len() > 0 {
+			let random_index = self.rng.gen_range(0, self.foods.len());
+
+			Some(self.foods[random_index].id)
+		} else {
+			None
+		}
 	}
 }

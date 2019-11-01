@@ -15,6 +15,7 @@ use bbggez::{
 use random_walker::RandomWalker;
 use attraction_walker::AttractionWalker;
 
+use crate::foods::Foods;
 use crate::foods::food::Food;
 
 #[derive(Clone, Debug)]
@@ -41,17 +42,23 @@ impl Walkers {
 		}
 	}
 
-	pub fn update(&mut self, arena_size: (f32, f32), foods: &mut Vec<Food>, ticks: usize, delta_time: f32, context: &mut Context) {
+	pub fn update(
+		&mut self, arena_size: (f32, f32),
+		ticks: usize, 
+		delta_time: f32, 
+		context: &mut Context,
+		food_controller: &mut Foods,
+	) {
 		self.walkers
 			.iter_mut()
 			.for_each(|walker| {
 				match walker {
 					Walker::RandomWalker(walker) => {
-						walker.update(arena_size, delta_time, foods, context);
+						walker.update(arena_size, delta_time, &mut food_controller.foods, context);
 					},
 					Walker::AttractionWalker(walker) => {
-						walker.update(foods, delta_time, context);
-						walker.eat(foods);
+						walker.update(food_controller, delta_time, context);
+						walker.eat(&mut food_controller.foods);
 					},
 				};
 			});

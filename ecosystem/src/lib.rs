@@ -38,7 +38,12 @@ impl EventHandler for Game {
 		let delta_time = timer::delta(context).as_nanos() as f32 / 1e9;
 		let ticks = timer::ticks(context);
 		let arena_size = graphics::drawable_size(context);
-		self.walkers.update(arena_size, &mut self.foods.foods, timer::ticks(context), delta_time, context);
+		self.walkers.update(
+			arena_size,
+			timer::ticks(context), 
+			delta_time, context,
+			&mut self.foods,
+		);
 		self.foods.update(ticks, arena_size, &mut self.utility, context);
 
 		if self.is_first_tick {
