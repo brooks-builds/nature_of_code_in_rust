@@ -10,7 +10,7 @@
 * [x] use bbggez properly
 * [x] less poison, more food
 * [x] Implement window resizing
-* [ ] Add force based walker - keep the walkers in the arena
+* [x] Add force based walker - keep the walkers in the arena
 * [ ] Walkers can eat eachother
 * [ ] Refactor for dry
 * [ ] Create screenshots for thumbnails

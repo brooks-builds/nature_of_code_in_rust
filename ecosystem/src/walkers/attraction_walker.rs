@@ -15,6 +15,7 @@ use bbggez::{
 
 use crate::Foods;
 use crate::foods::food::Food;
+use super::walker_traits::WalkerMovement;
 
 #[derive(Clone, Debug)]
 pub struct AttractionWalker {
@@ -58,7 +59,13 @@ impl AttractionWalker {
 		}
 	}
 
-	pub fn update(&mut self, foods: &mut Foods, delta_time: f32, context: &mut Context) {
+	pub fn update(
+		&mut self, 
+		foods: &mut Foods, 
+		delta_time: f32, 
+		context: &mut Context,
+		arena_size: (f32, f32),
+	) {
 		let target = self.choose_target(foods);
 
 		if let Some(target) = target.as_ref() {
@@ -78,6 +85,8 @@ impl AttractionWalker {
 			self.spend_energy();
 			self.timer = self.lose_energy_every_seconds;
 		}
+
+		self.keep_in_arena(arena_size);
 	}
 
 	pub fn is_alive(&self) -> bool {
@@ -177,3 +186,16 @@ impl AttractionWalker {
 	}
 }
 
+impl WalkerMovement for AttractionWalker {
+	fn set_location(&mut self, location: Vector2<f32>) {
+		self.location = location;
+	}
+
+	fn get_health(&self) -> f32 {
+		self.health
+	}
+
+	fn get_location(&self) -> Vector2<f32> {
+		self.location.clone()
+	}
+}

@@ -1,22 +1,22 @@
 mod random_walker;
 mod attraction_walker;
+mod walker_traits;
 
 use bbggez::{
 	ggez::{
 		graphics,
-		graphics::{DrawParam, Scale},
+		graphics::{DrawParam},
 		Context,
 		nalgebra::{Point2},
-		mint,
 		GameResult,
 	},
 	Utility
 };
 use random_walker::RandomWalker;
 use attraction_walker::AttractionWalker;
+use walker_traits::WalkerMovement;
 
 use crate::foods::Foods;
-use crate::foods::food::Food;
 
 #[derive(Clone, Debug)]
 enum Walker {
@@ -43,7 +43,8 @@ impl Walkers {
 	}
 
 	pub fn update(
-		&mut self, arena_size: (f32, f32),
+		&mut self, 
+		arena_size: (f32, f32),
 		ticks: usize, 
 		delta_time: f32, 
 		context: &mut Context,
@@ -57,7 +58,7 @@ impl Walkers {
 						walker.update(arena_size, delta_time, &mut food_controller.foods, context);
 					},
 					Walker::AttractionWalker(walker) => {
-						walker.update(food_controller, delta_time, context);
+						walker.update(food_controller, delta_time, context, arena_size);
 						walker.eat(&mut food_controller.foods);
 					},
 				};

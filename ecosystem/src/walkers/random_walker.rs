@@ -11,6 +11,7 @@ use bbggez::{
 	Utility,
 };
 use crate::foods::food::Food;
+use super::walker_traits::WalkerMovement;
 
 #[derive(Clone, Debug)]
 pub struct RandomWalker {
@@ -58,20 +59,6 @@ impl RandomWalker {
 		self.keep_in_arena((arena_width, arena_height));
 	}
 
-	fn keep_in_arena(&mut self, (arena_width, arena_height): (f32, f32)) {
-		if self.location.x - self.size > arena_width {
-			self.location.x = -self.size;
-		}  else if self.location.x + self.size < 0.0 {
-			self.location.x = arena_width - self.size;
-		} 
-
-		if self.location.y - self.size > arena_height {
-			self.location.y = -self.size;
-		} else if self.location.y + self.size < 0.0 {
-			self.location.y = arena_height - self.size;
-		}
-	}
-
 	pub fn eat(&mut self, foods: &mut Vec<Food>) {
 		for (index, food) in foods.clone().iter().enumerate().rev() {
 			let direction = food.location - self.location;
@@ -102,5 +89,19 @@ impl RandomWalker {
 			self.spend_energy();
 			self.timer = self.lose_energy_every_seconds;
 		}
+	}
+}
+
+impl WalkerMovement for RandomWalker {
+	fn set_location(&mut self, location: Vector2<f32>) {
+		self.location = location;
+	}
+
+	fn get_health(&self) -> f32 {
+		self.size
+	}
+
+	fn get_location(&self) -> Vector2<f32> {
+		self.location.clone()
 	}
 }
