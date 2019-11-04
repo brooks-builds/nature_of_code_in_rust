@@ -198,4 +198,8 @@ impl WalkerMovement for AttractionWalker {
 	fn get_location(&self) -> Vector2<f32> {
 		self.location.clone()
 	}
+
+	fn set_size(&mut self, new_size: f32) {
+		self.health = new_size;
+	}
 }

@@ -59,19 +59,6 @@ impl RandomWalker {
 		self.keep_in_arena((arena_width, arena_height));
 	}
 
-	pub fn eat(&mut self, foods: &mut Vec<Food>) {
-		for (index, food) in foods.clone().iter().enumerate().rev() {
-			let direction = food.location - self.location;
-			let distance = direction.magnitude();
-
-			if distance <= self.size {
-				self.size = self.size + food.calories;
-				foods.remove(index);
-			}
-
-		}
-	}
-
 	pub fn spend_energy(&mut self) {
 		self.size = self.size - self.spend_energy_rate;
 	}
@@ -103,5 +90,9 @@ impl WalkerMovement for RandomWalker {
 
 	fn get_location(&self) -> Vector2<f32> {
 		self.location.clone()
+	}
+
+	fn set_size(&mut self, new_size: f32) {
+		self.size = new_size;
 	}
 }

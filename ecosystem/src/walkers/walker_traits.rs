@@ -1,4 +1,5 @@
 use bbggez::ggez::nalgebra::Vector2;
+use crate::foods::food::Food;
 
 pub trait WalkerMovement {
 	fn keep_in_arena(&mut self, (arena_width, arena_height): (f32, f32)) {
@@ -18,7 +19,6 @@ pub trait WalkerMovement {
 		}
 
 		if location != self.get_location() {
-			println!("got here");
 			self.set_location(location);
 		}
 	}
@@ -28,4 +28,31 @@ pub trait WalkerMovement {
 	fn get_location(&self) -> Vector2<f32>;
 
 	fn get_health(&self) -> f32;
+
+	fn eat(&mut self, foods: &mut Vec<Food>) {
+		for (index, food) in foods.clone().iter().enumerate().rev() {
+			let direction = food.location - self.get_location();
+			let distance = direction.magnitude();
+			let size = self.get_health();
+
+			if distance <= size {
+				self.set_size(size + food.calories);
+				foods.remove(index);
+			}
+
+		}
+	}
+
+	fn set_size(&mut self, new_size: f32);
+
+	fn get_distance(&self, other_location: Vector2<f32>) -> f32 {
+		let location = self.get_location();
+		let direction = location - other_location;
+
+		direction.magnitude()
+	}
+
+	fn is_larger(&self, other_size: f32) -> bool {
+		self.get_health() > other_size
+	}
 }
