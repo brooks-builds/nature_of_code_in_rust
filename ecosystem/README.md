@@ -11,9 +11,11 @@
 * [x] less poison, more food
 * [x] Implement window resizing
 * [x] Add force based walker - keep the walkers in the arena
+* [ ] Remove the enum, use a box, dynamic type, hashmap, and the trait
 * [ ] Walkers can eat eachother
 * [ ] Refactor for dry
 * [ ] Create screenshots for thumbnails
+* [ ] Run cargo fmt
 
 # Maybe todo
 
