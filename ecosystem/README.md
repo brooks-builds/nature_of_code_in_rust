@@ -2,17 +2,15 @@
 
 -   [x] Create arena
 -   [x] start with some food
--   [ ] food randomly moves around (using delta time)
--   [ ] keep everything in the arena
--   [ ] Add food every n seconds
--   [ ] poison food after it ages (and make blue for red green color blindness)
--   [ ] different shapes for food types
--   [ ] food goes away after some time
--   [ ] walker that moves towards food
--   [ ] walker can eat food
--   [ ] Walkers can eat eachother
--   [ ] kill the walker if it runs out of energy
+-   [x] lots of food randomly sitting around
+-   [x] random movers randomly moving around
+-   [x] walker can eat food
+-   [x] keep everything in the arena
+-   [x] Walkers can eat eachother
+-   [ ] Cap the size
+-   [ ] walker that moves towards a random entity that they can eat
 -   [ ] Create screenshots for thumbnails
+-   [ ] last walker alive wins
 
 # Maybe todo
 
