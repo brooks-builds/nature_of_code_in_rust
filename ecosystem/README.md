@@ -7,10 +7,11 @@
 -   [x] walker can eat food
 -   [x] keep everything in the arena
 -   [x] Walkers can eat eachother
--   [ ] Cap the size
+-   [x] Slow the growth
 -   [ ] walker that moves towards a random entity that they can eat
 -   [ ] Create screenshots for thumbnails
 -   [ ] last walker alive wins
+-   [ ] Performance increase
 
 # Maybe todo
 
