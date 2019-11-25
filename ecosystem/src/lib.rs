@@ -16,16 +16,27 @@ use specs::{
 pub struct Game {
 	world: World,
 	rng: ThreadRng,
+	walker_mesh: graphics::Mesh,
 }
 
 impl Game {
-	pub fn new(arena_width: f32, arena_height: f32) -> Game {
+	pub fn new(arena_width: f32, arena_height: f32, context: &mut Context) -> Game {
 		let mut world = World::new();
 		let food_calories = 2.0;
 		let mut rng = rand::thread_rng();
+		let walker_mesh = graphics::MeshBuilder::new()
+			.circle(
+				graphics::DrawMode::fill(),
+				Point2::new(0.0, 0.0),
+				1.0,
+				0.0000000001,
+				graphics::WHITE,
+			)
+			.build(context)
+			.unwrap();
 
 		world.insert(ArenaSize(arena_width, arena_height));
-		world.insert(GrowRate(0.25));
+		world.insert(GrowRate(1.0));
 		world.register::<Health>();
 		world.register::<Location>();
 		world.register::<Velocity>();
@@ -89,7 +100,11 @@ impl Game {
 				.build();
 		}
 
-		Game { world, rng }
+		Game {
+			world,
+			rng,
+			walker_mesh,
+		}
 	}
 }
 
@@ -104,15 +119,20 @@ impl EventHandler for Game {
 		let mut choose_target = ChooseTargetSystem(self.rng);
 		let mut attraction_move = AttractionMoveSystem;
 		let mut drag = DragSystem;
+		let mut drop_target = DropTargetSystem;
 
 		random_move.run_now(&self.world);
+		// drop target
+		drop_target.run_now(&self.world);
+		// choose target
+		choose_target.run_now(&self.world);
+		// move towards target
+		attraction_move.run_now(&self.world);
+		drag.run_now(&self.world);
 		physics.run_now(&self.world);
 		eat.run_now(&self.world);
 		grow.run_now(&self.world);
 		contain_to_arena.run_now(&self.world);
-		choose_target.run_now(&self.world);
-		attraction_move.run_now(&self.world);
-		drag.run_now(&self.world);
 
 		self.world.maintain();
 		Ok(())
@@ -121,7 +141,10 @@ impl EventHandler for Game {
 	fn draw(&mut self, context: &mut Context) -> GameResult<()> {
 		graphics::clear(context, graphics::BLACK);
 
-		let mut draw_system = DrawSystem(context);
+		let mut draw_system = DrawSystem {
+			context,
+			walker_mesh: &self.walker_mesh,
+		};
 
 		draw_system.run_now(&self.world);
 
@@ -196,7 +219,10 @@ struct Target(Option<Entity>);
 #[derive(Component, Default)]
 struct Drag;
 
-struct DrawSystem<'a>(&'a mut Context);
+struct DrawSystem<'a> {
+	context: &'a mut Context,
+	walker_mesh: &'a graphics::Mesh,
+}
 
 impl<'a> System<'a> for DrawSystem<'a> {
 	type SystemData = (
@@ -210,18 +236,15 @@ impl<'a> System<'a> for DrawSystem<'a> {
 		use specs::Join;
 
 		for (location, health, color) in (&location, &health, &color).join() {
-			let mesh = graphics::MeshBuilder::new()
-				.circle(
-					graphics::DrawMode::fill(),
-					Point2::from(location.0),
-					health.0,
-					0.000001,
-					color.0,
-				)
-				.build(self.0)
-				.unwrap();
-
-			graphics::draw(self.0, &mesh, graphics::DrawParam::default()).unwrap();
+			graphics::draw(
+				&mut self.context,
+				self.walker_mesh,
+				graphics::DrawParam::default()
+					.dest(Point2::from(location.0))
+					.scale([health.0, health.0])
+					.color(color.0),
+			)
+			.unwrap();
 		}
 
 		let border_mesh = graphics::MeshBuilder::new()
@@ -230,14 +253,19 @@ impl<'a> System<'a> for DrawSystem<'a> {
 				graphics::Rect::new(0.0, 0.0, arena_size.0, arena_size.1),
 				graphics::WHITE,
 			)
-			.build(self.0)
+			.build(&mut self.context)
 			.unwrap();
 
-		graphics::draw(self.0, &border_mesh, graphics::DrawParam::default()).unwrap();
-
-		let fps = graphics::Text::new(format!("fps: {}", timer::fps(self.0)));
 		graphics::draw(
-			self.0,
+			&mut self.context,
+			&border_mesh,
+			graphics::DrawParam::default(),
+		)
+		.unwrap();
+
+		let fps = graphics::Text::new(format!("fps: {}", timer::fps(&mut self.context)));
+		graphics::draw(
+			&mut self.context,
 			&fps,
 			graphics::DrawParam::default().dest(Point2::new(5.0, 5.0)),
 		)
@@ -258,7 +286,7 @@ impl<'a> System<'a> for RandomMoveSystem {
 		use specs::Join;
 
 		for (speed, acceleration, _) in (&speed, &mut acceleration, &random_walker).join() {
-			let force = Vector2::new(self.0.gen_range(-1.0, 1.0), self.0.gen_range(-1.0, 1.0));
+			let force = Vector2::new(self.0.gen_range(-10.0, 10.0), self.0.gen_range(-10.0, 10.0));
 
 			acceleration.0 += force * speed.0;
 		}
@@ -352,7 +380,7 @@ impl<'a> System<'a> for EatSystem {
 					let distance = my_location.0 - other_location.0;
 					let distance = distance.magnitude();
 
-					if distance < my_health.0 {
+					if distance < my_health.0 && my_health.0 >= other_health.0 {
 						grow_by.0 += other_health.0 * grow_rate.0;
 						entities.delete(other).unwrap();
 					}
@@ -426,27 +454,20 @@ impl<'a> System<'a> for ChooseTargetSystem {
 		for (_, myself, target, my_health) in
 			(&attraction_walker, &entities, &mut target, &health).join()
 		{
-			if let Some(current_target) = target.0 {
-				if entities.is_alive(current_target) {
-					break;
-				} else {
-					target.0 = None;
-				}
-			} else {
-				let mut potential_targets = vec![];
-
-				for (other, other_health) in (&entities, &health).join() {
-					if myself != other && other_health.0 <= my_health.0 {
-						potential_targets.push(other);
+			match target.0 {
+				None => {
+					let mut potential_targets = vec![];
+					for (other, other_health) in (&entities, &health).join() {
+						if myself != other && other_health.0 <= my_health.0 {
+							potential_targets.push(other);
+						}
+					}
+					if potential_targets.len() > 0 {
+						let index = self.0.gen_range(0, potential_targets.len());
+						target.0 = Some(potential_targets[index]);
 					}
 				}
-
-				if potential_targets.len() > 0 {
-					let index = self.0.gen_range(0, potential_targets.len());
-					target.0 = Some(potential_targets[index]);
-				} else {
-					target.0 = None;
-				}
+				_ => continue,
 			}
 		}
 	}
@@ -464,6 +485,40 @@ impl<'a> System<'a> for DragSystem {
 			let mut drag = velocity.0 * -1.0;
 			drag *= 0.07;
 			acceleration.0 += drag;
+		}
+	}
+}
+
+struct DropTargetSystem;
+
+impl<'a> System<'a> for DropTargetSystem {
+	type SystemData = (
+		Entities<'a>,
+		ReadStorage<'a, Health>,
+		WriteStorage<'a, Target>,
+	);
+
+	fn run(&mut self, (entities, health, mut target): Self::SystemData) {
+		use specs::Join;
+
+		for (my_health, target) in (&health, &mut target).join() {
+			// we don't have a target
+			// we have a target
+			// target is now bigger than us
+			// target is still good
+			// target is dead
+			match target.0 {
+				None => continue,
+				Some(other_entity) => {
+					if let Some(other_health) = health.get(other_entity) {
+						if my_health.0 < other_health.0 {
+							target.0 = None;
+						}
+					} else {
+						target.0 = None;
+					}
+				}
+			}
 		}
 	}
 }
