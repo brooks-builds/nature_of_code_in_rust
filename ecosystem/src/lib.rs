@@ -50,7 +50,7 @@ impl Game {
 		world.register::<Drag>();
 
 		// add food
-		for _ in 0..100 {
+		for _ in 0..20 {
 			world
 				.create_entity()
 				.with(Health(food_calories))
@@ -63,7 +63,7 @@ impl Game {
 		}
 
 		// add random walkers
-		for _ in 0..5 {
+		for _ in 0..1 {
 			world
 				.create_entity()
 				.with(Health(food_calories))
@@ -81,7 +81,7 @@ impl Game {
 		}
 
 		// add attraction walkers
-		for _ in 0..5 {
+		for _ in 0..1 {
 			world
 				.create_entity()
 				.with(Health(food_calories))
@@ -92,7 +92,7 @@ impl Game {
 				.with(Color::new())
 				.with(Velocity::new())
 				.with(Acceleration::new())
-				.with(Speed(10.0))
+				.with(Speed(11.0))
 				.with(GrowBy(0.0))
 				.with(AttractionWalker)
 				.with(Target(None))
@@ -483,7 +483,7 @@ impl<'a> System<'a> for DragSystem {
 
 		for (velocity, acceleration) in (&velocity, &mut acceleration).join() {
 			let mut drag = velocity.0 * -1.0;
-			drag *= 0.07;
+			drag *= 0.001;
 			acceleration.0 += drag;
 		}
 	}
