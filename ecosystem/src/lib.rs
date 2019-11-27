@@ -22,7 +22,7 @@ pub struct Game {
 impl Game {
 	pub fn new(arena_width: f32, arena_height: f32, context: &mut Context) -> Game {
 		let mut world = World::new();
-		let food_calories = 2.0;
+		let base_health = 2.0;
 		let mut rng = rand::thread_rng();
 		let walker_mesh = graphics::MeshBuilder::new()
 			.circle(
@@ -50,10 +50,10 @@ impl Game {
 		world.register::<Drag>();
 
 		// add food
-		for _ in 0..20 {
+		for _ in 0..100 {
 			world
 				.create_entity()
-				.with(Health(food_calories))
+				.with(Health(rng.gen_range(1.0, 5.0)))
 				.with(Location(Vector2::new(
 					rng.gen_range(10.0, arena_width - 10.0),
 					rng.gen_range(10.0, arena_height - 10.0),
@@ -63,10 +63,10 @@ impl Game {
 		}
 
 		// add random walkers
-		for _ in 0..1 {
+		for _ in 0..5 {
 			world
 				.create_entity()
-				.with(Health(food_calories))
+				.with(Health(base_health))
 				.with(Location(Vector2::new(
 					rng.gen_range(10.0, arena_width - 10.0),
 					rng.gen_range(10.0, arena_height - 10.0),
@@ -74,17 +74,17 @@ impl Game {
 				.with(Color::new())
 				.with(Velocity::new())
 				.with(Acceleration::new())
-				.with(Speed(10.0))
+				.with(Speed(5.0))
 				.with(GrowBy(0.0))
 				.with(RandomWalker)
 				.build();
 		}
 
 		// add attraction walkers
-		for _ in 0..1 {
+		for _ in 0..5 {
 			world
 				.create_entity()
-				.with(Health(food_calories))
+				.with(Health(base_health))
 				.with(Location(Vector2::new(
 					rng.gen_range(10.0, arena_width - 10.0),
 					rng.gen_range(10.0, arena_height - 10.0),
@@ -92,7 +92,7 @@ impl Game {
 				.with(Color::new())
 				.with(Velocity::new())
 				.with(Acceleration::new())
-				.with(Speed(11.0))
+				.with(Speed(4.0))
 				.with(GrowBy(0.0))
 				.with(AttractionWalker)
 				.with(Target(None))
@@ -380,7 +380,7 @@ impl<'a> System<'a> for EatSystem {
 					let distance = my_location.0 - other_location.0;
 					let distance = distance.magnitude();
 
-					if distance < my_health.0 && my_health.0 >= other_health.0 {
+					if distance < my_health.0 && my_health.0 > other_health.0 {
 						grow_by.0 += other_health.0 * grow_rate.0;
 						entities.delete(other).unwrap();
 					}
@@ -458,7 +458,7 @@ impl<'a> System<'a> for ChooseTargetSystem {
 				None => {
 					let mut potential_targets = vec![];
 					for (other, other_health) in (&entities, &health).join() {
-						if myself != other && other_health.0 <= my_health.0 {
+						if myself != other && other_health.0 < my_health.0 {
 							potential_targets.push(other);
 						}
 					}
@@ -483,7 +483,7 @@ impl<'a> System<'a> for DragSystem {
 
 		for (velocity, acceleration) in (&velocity, &mut acceleration).join() {
 			let mut drag = velocity.0 * -1.0;
-			drag *= 0.001;
+			drag *= 0.0001;
 			acceleration.0 += drag;
 		}
 	}

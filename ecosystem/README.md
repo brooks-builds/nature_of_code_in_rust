@@ -8,10 +8,11 @@
 -   [x] keep everything in the arena
 -   [x] Walkers can eat eachother
 -   [x] Slow the growth
--   [ ] walker that moves towards a random entity that they can eat
--   [ ] Create screenshots for thumbnails
+-   [x] walker that moves towards a random entity that they can eat
+-   [x] Performance increase
+-   [ ] Walkers don't disapear when eating each other
 -   [ ] last walker alive wins
--   [ ] Performance increase
+-   [ ] Create screenshots for thumbnails
 
 # Maybe todo
 
