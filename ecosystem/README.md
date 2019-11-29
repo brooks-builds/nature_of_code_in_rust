@@ -10,12 +10,12 @@
 -   [x] Slow the growth
 -   [x] walker that moves towards a random entity that they can eat
 -   [x] Performance increase
--   [ ] Walkers don't disapear when eating each other
--   [ ] last walker alive wins
--   [ ] Create screenshots for thumbnails
+-   [x] Walkers don't disapear when eating each other
 
 # Maybe todo
 
+-   [ ] Create screenshots for thumbnails
+-   [ ] last walker alive wins
 -   [ ] Scalable energy usage based on size - Cotoli
 -   [ ] move faster as smaller - Crozbo
 -   [ ] Reproduction system (same type touch each other, new one appears) - Brookzerker
