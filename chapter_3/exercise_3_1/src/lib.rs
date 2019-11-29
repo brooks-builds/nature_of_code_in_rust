@@ -1,13 +1,21 @@
-use bbggez::ggez::{event::EventHandler, graphics, nalgebra::Point2, timer, Context, GameResult};
-// use specs::{Component, DenseVecStorage, World, WorldExt};
+use bbggez::{
+	ggez::{
+		event::EventHandler,
+		graphics,
+		nalgebra::{Point2, Vector2},
+		timer, Context, GameResult,
+	},
+	rand,
+	rand::prelude::*,
+};
+use specs::{
+	Builder, Component, DenseVecStorage, ReadStorage, RunNow, System, World, WorldExt, WriteStorage,
+};
 
 pub struct Game {
 	background_color: graphics::Color,
 	baton_mesh: graphics::Mesh,
-	angle: f32,
-	angular_velocity: f32,
-	angular_acceleration: f32,
-	angular_velocity_max: f32,
+	world: World,
 }
 
 impl Game {
@@ -42,18 +50,36 @@ impl Game {
 				cap_color,
 			)
 			.build(context)?;
-		let angle = 0.0;
-		let angular_velocity = 0.0;
-		let angular_acceleration = 0.001;
-		let angular_velocity_max = 0.02;
+		let mut world = World::new();
+		let mut rng = rand::thread_rng();
+		let (width, height) = graphics::drawable_size(context);
+
+		world.register::<Location>();
+		world.register::<Angle>();
+		world.register::<AngularVelocity>();
+		world.register::<AngularAcceleration>();
+		world.register::<AngularVelocityMax>();
+		world.register::<Scale>();
+
+		for _ in 0..20 {
+			world
+				.create_entity()
+				.with(Location::new(
+					rng.gen_range(0.0, width),
+					rng.gen_range(0.0, height),
+				))
+				.with(Angle(0.0))
+				.with(AngularVelocity(0.0))
+				.with(AngularAcceleration(rng.gen_range(0.01, 0.9)))
+				.with(AngularVelocityMax(rng.gen_range(3.0, 10.0)))
+				.with(Scale(rng.gen_range(-2.0, 0.0)))
+				.build();
+		}
 
 		Ok(Game {
 			background_color,
 			baton_mesh,
-			angle,
-			angular_velocity,
-			angular_acceleration,
-			angular_velocity_max,
+			world,
 		})
 	}
 }
@@ -62,38 +88,118 @@ impl EventHandler for Game {
 	fn update(&mut self, context: &mut Context) -> GameResult<()> {
 		let delta_time = timer::delta(context).as_secs_f32();
 
-		self.angular_velocity += self.angular_acceleration * delta_time;
-		if self.angular_velocity > self.angular_velocity_max {
-			self.angular_velocity = self.angular_velocity_max;
-		}
-		self.angle += self.angular_velocity;
+		let mut rotate_system = RotateSystem { delta_time };
+
+		rotate_system.run_now(&self.world);
+
 		Ok(())
 	}
 
 	fn draw(&mut self, context: &mut Context) -> GameResult<()> {
 		graphics::clear(context, self.background_color);
 
-		let (width, height) = graphics::drawable_size(context);
-
-		graphics::draw(
+		let mut draw_system = DrawSystem {
 			context,
-			&self.baton_mesh,
-			graphics::DrawParam::new()
-				.dest(Point2::new(width / 2.0, height / 2.0))
-				.rotation(self.angle),
-		)?;
+			baton_mesh: &self.baton_mesh,
+		};
 
-		let angular_velocity_text =
-			graphics::Text::new(format!("angular velocity: {}", self.angular_velocity));
-
-		graphics::draw(
-			context,
-			&angular_velocity_text,
-			graphics::DrawParam::new()
-				.dest(Point2::new(5.0, 5.0))
-				.color(graphics::BLACK),
-		)?;
+		draw_system.run_now(&self.world);
 
 		graphics::present(context)
+	}
+}
+
+#[derive(Component)]
+struct Location(Vector2<f32>);
+
+impl Location {
+	pub fn new(x: f32, y: f32) -> Location {
+		Location(Vector2::new(x, y))
+	}
+}
+
+#[derive(Component)]
+struct Angle(f32);
+
+#[derive(Component)]
+struct AngularVelocity(f32);
+
+#[derive(Component)]
+struct AngularAcceleration(f32);
+
+#[derive(Component)]
+struct AngularVelocityMax(f32);
+
+#[derive(Component)]
+struct Scale(f32);
+
+struct DrawSystem<'a> {
+	context: &'a mut Context,
+	baton_mesh: &'a graphics::Mesh,
+}
+
+impl<'a> System<'a> for DrawSystem<'a> {
+	type SystemData = (
+		ReadStorage<'a, Location>,
+		ReadStorage<'a, Angle>,
+		ReadStorage<'a, AngularVelocity>,
+		ReadStorage<'a, Scale>,
+	);
+
+	fn run(&mut self, (location, angle, angular_velocity, scale): Self::SystemData) {
+		use specs::Join;
+
+		for (location, angle, angular_velocity, scale) in
+			(&location, &angle, &angular_velocity, &scale).join()
+		{
+			graphics::draw(
+				self.context,
+				self.baton_mesh,
+				graphics::DrawParam::new()
+					.dest(Point2::from(location.0))
+					.scale([scale.0, scale.0])
+					.rotation(angle.0),
+			)
+			.unwrap();
+
+			// let angular_velocity_text =
+			// 	graphics::Text::new(format!("angular velocity: {}", angular_velocity.0));
+
+			// graphics::draw(
+			// 	self.context,
+			// 	&angular_velocity_text,
+			// 	graphics::DrawParam::new()
+			// 		.dest(Point2::new(5.0, 5.0))
+			// 		.color(graphics::BLACK),
+			// )
+			// .unwrap();
+		}
+	}
+}
+
+struct RotateSystem {
+	delta_time: f32,
+}
+
+impl<'a> System<'a> for RotateSystem {
+	type SystemData = (
+		WriteStorage<'a, Angle>,
+		WriteStorage<'a, AngularVelocity>,
+		ReadStorage<'a, AngularAcceleration>,
+		ReadStorage<'a, AngularVelocityMax>,
+	);
+
+	fn run(&mut self, (mut angle, mut velocity, acceleration, velocity_max): Self::SystemData) {
+		use specs::Join;
+
+		for (angle, velocity, acceleration, velocity_max) in
+			(&mut angle, &mut velocity, &acceleration, &velocity_max).join()
+		{
+			velocity.0 += acceleration.0 * self.delta_time;
+			if velocity.0 > velocity_max.0 {
+				velocity.0 = velocity_max.0;
+			}
+			angle.0 += velocity.0 * self.delta_time;
+		}
 	}
 }
