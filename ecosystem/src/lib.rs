@@ -50,7 +50,7 @@ impl Game {
 		world.register::<Drag>();
 
 		// add food
-		for _ in 0..100 {
+		for _ in 0..200 {
 			world
 				.create_entity()
 				.with(Health(rng.gen_range(1.0, 5.0)))
@@ -96,7 +96,7 @@ impl Game {
 				.with(GrowBy(0.0))
 				.with(AttractionWalker)
 				.with(Target(None))
-				.with(Drag)
+				.with(Drag(0.05))
 				.build();
 		}
 
@@ -216,8 +216,8 @@ struct AttractionWalker;
 #[derive(Component)]
 struct Target(Option<Entity>);
 
-#[derive(Component, Default)]
-struct Drag;
+#[derive(Component)]
+struct Drag(f32);
 
 struct DrawSystem<'a> {
 	context: &'a mut Context,
@@ -476,15 +476,19 @@ impl<'a> System<'a> for ChooseTargetSystem {
 struct DragSystem;
 
 impl<'a> System<'a> for DragSystem {
-	type SystemData = (ReadStorage<'a, Velocity>, WriteStorage<'a, Acceleration>);
+	type SystemData = (
+		ReadStorage<'a, Velocity>,
+		WriteStorage<'a, Acceleration>,
+		ReadStorage<'a, Drag>,
+	);
 
-	fn run(&mut self, (velocity, mut acceleration): Self::SystemData) {
+	fn run(&mut self, (velocity, mut acceleration, drag): Self::SystemData) {
 		use specs::Join;
 
-		for (velocity, acceleration) in (&velocity, &mut acceleration).join() {
-			let mut drag = velocity.0 * -1.0;
-			drag *= 0.0001;
-			acceleration.0 += drag;
+		for (velocity, acceleration, drag) in (&velocity, &mut acceleration, &drag).join() {
+			let opposite_direction = velocity.0 * -1.0;
+			let drag_force = opposite_direction * drag.0;
+			acceleration.0 += drag_force;
 		}
 	}
 }
@@ -492,13 +496,9 @@ impl<'a> System<'a> for DragSystem {
 struct DropTargetSystem;
 
 impl<'a> System<'a> for DropTargetSystem {
-	type SystemData = (
-		Entities<'a>,
-		ReadStorage<'a, Health>,
-		WriteStorage<'a, Target>,
-	);
+	type SystemData = (ReadStorage<'a, Health>, WriteStorage<'a, Target>);
 
-	fn run(&mut self, (entities, health, mut target): Self::SystemData) {
+	fn run(&mut self, (health, mut target): Self::SystemData) {
 		use specs::Join;
 
 		for (my_health, target) in (&health, &mut target).join() {
