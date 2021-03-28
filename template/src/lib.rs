@@ -3,7 +3,6 @@ use ggez::graphics::{self, Color, BLACK};
 use ggez::{Context, GameResult};
 
 mod utilities;
-mod walker;
 
 pub struct MainState {
     background_color: Color,
