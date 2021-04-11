@@ -1,5 +1,5 @@
 use num::Num;
-use std::ops::{Add, AddAssign};
+use std::ops::{Add, AddAssign, Sub, SubAssign};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vector2<T> {
@@ -43,5 +43,29 @@ where
     fn add_assign(&mut self, rhs: Self) {
         self.x = self.x + rhs.x;
         self.y += rhs.y;
+    }
+}
+
+impl<T> Sub for Vector2<T>
+where
+    T: Num,
+{
+    type Output = Vector2<T>;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
+    }
+}
+
+impl<T> SubAssign for Vector2<T>
+where
+    T: Num + Copy + SubAssign,
+{
+    fn sub_assign(&mut self, rhs: Self) {
+        self.x -= rhs.x;
+        self.y -= rhs.y;
     }
 }
