@@ -1,0 +1,47 @@
+use num::Num;
+use std::ops::{Add, AddAssign};
+
+#[derive(Debug, Copy, Clone)]
+pub struct Vector2<T> {
+    pub x: T,
+    pub y: T,
+}
+
+impl<T> Vector2<T>
+where
+    T: Num + Copy,
+{
+    #[allow(dead_code)]
+    pub fn new(x: T, y: T) -> Self {
+        Self { x, y }
+    }
+
+    #[allow(dead_code)]
+    pub fn to_array(&self) -> [T; 2] {
+        [self.x, self.y]
+    }
+}
+
+impl<T> Add for Vector2<T>
+where
+    T: Num,
+{
+    type Output = Vector2<T>;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
+}
+
+impl<T> AddAssign for Vector2<T>
+where
+    T: Num + Copy + AddAssign,
+{
+    fn add_assign(&mut self, rhs: Self) {
+        self.x = self.x + rhs.x;
+        self.y += rhs.y;
+    }
+}
