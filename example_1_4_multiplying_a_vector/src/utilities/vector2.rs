@@ -21,7 +21,6 @@ where
         [self.x, self.y]
     }
 
-    #[allow(dead_code)]
     pub fn multiply_scalar(&mut self, scalar: T) {
         self.x *= scalar;
         self.y *= scalar;
