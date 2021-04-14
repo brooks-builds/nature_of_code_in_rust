@@ -7,26 +7,27 @@ pub struct Vector2<T> {
     pub y: T,
 }
 
-#[allow(dead_code)]
 impl<T> Vector2<T>
 where
     T: Num + Copy + MulAssign,
 {
+    #[allow(dead_code)]
     pub fn new(x: T, y: T) -> Self {
         Self { x, y }
     }
 
+    #[allow(dead_code)]
     pub fn to_array(&self) -> [T; 2] {
         [self.x, self.y]
     }
 
+    #[allow(dead_code)]
     pub fn multiply_scalar(&mut self, scalar: T) {
         self.x *= scalar;
         self.y *= scalar;
     }
 }
 
-#[allow(dead_code)]
 impl<T> Vector2<T>
 where
     T: Num + Float,
