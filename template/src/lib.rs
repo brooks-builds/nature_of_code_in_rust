@@ -2,6 +2,7 @@ use ggez::event::EventHandler;
 use ggez::graphics::{self, Color, BLACK};
 use ggez::{Context, GameResult};
 
+mod mover;
 mod utilities;
 
 pub struct MainState {
