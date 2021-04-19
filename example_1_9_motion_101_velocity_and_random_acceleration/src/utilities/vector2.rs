@@ -32,7 +32,7 @@ impl Vector2 {
     }
 
     /**
-    Get the length of the vector, where the length is the hypotenuse of the trangle that each arm of the vector represents.
+    Get the length of the vector, where the length is the hypotenuse of the triangle that each arm of the vector represents.
 
     ```
     use nature_of_code_in_rust::utilities::vector2::Vector2;
