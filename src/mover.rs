@@ -3,7 +3,6 @@ use ggez::graphics::{DrawMode, DrawParam, Mesh, MeshBuilder, WHITE};
 use ggez::input::keyboard::is_key_pressed;
 use ggez::{graphics, Context, GameResult};
 
-use crate::utilities::input::mouse_location;
 use crate::utilities::vector2::Vector2;
 
 #[allow(dead_code)]
@@ -13,7 +12,6 @@ pub struct Mover {
     acceleration: Vector2,
     mesh: Option<Mesh>,
     topspeed: f32,
-    scale: f32,
 }
 
 #[allow(dead_code)]
@@ -28,7 +26,6 @@ impl Mover {
                 .build(context)?,
         );
         let topspeed = 10.0;
-        let scale = 0.5;
 
         Ok(Self {
             location,
@@ -36,11 +33,12 @@ impl Mover {
             acceleration,
             mesh,
             topspeed,
-            scale,
         })
     }
 
     pub fn update(&mut self) {
+        self.acceleration = Vector2::random();
+        self.acceleration.multiply_scalar(2.0);
         self.velocity += self.acceleration;
         self.velocity.limit(self.topspeed);
         self.location += self.velocity;
@@ -80,14 +78,5 @@ impl Mover {
         } else if is_key_pressed(context, KeyCode::Down) {
             self.acceleration = Vector2::new(0.0, 0.01);
         }
-    }
-
-    pub fn walk(&mut self, context: &mut Context) {
-        let mouse = mouse_location(context);
-        let mut direction = mouse - self.location;
-
-        direction.normalize();
-        direction.multiply_scalar(self.scale);
-        self.acceleration = direction;
     }
 }

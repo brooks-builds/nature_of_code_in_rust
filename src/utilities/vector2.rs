@@ -1,6 +1,5 @@
-use std::ops::{AddAssign, Sub};
+use std::ops::AddAssign;
 
-use num::Zero;
 use rand::random;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -29,24 +28,6 @@ impl Vector2 {
         let y = random::<f32>() - 0.5;
         let mut vector2 = Self::new(x, y);
         vector2.normalize();
-        vector2
-    }
-
-    /**
-    Take in a vector2 and a scalar, multiply them together and return a new Vector2.
-
-    ```
-    use nature_of_code_in_rust::utilities::vector2::Vector2;
-
-    let v = Vector2::new(1.0, 5.0);
-    let u = Vector2::multiply_scalar_static(v, 2.0);
-    assert_eq!(v, Vector2::new(1.0, 5.0));
-    assert_eq!(u, Vector2::new(2.0, 10.0));
-    ```
-    */
-    pub fn multiply_scalar_static(vector2: Self, scalar: f32) -> Self {
-        let mut vector2 = vector2;
-        vector2.multiply_scalar(scalar);
         vector2
     }
 
@@ -117,9 +98,6 @@ impl Vector2 {
     */
     pub fn normalize(&mut self) {
         let magnitude = self.magnitude();
-        if magnitude.is_zero() {
-            return;
-        }
         self.x /= magnitude;
         self.y /= magnitude;
     }
@@ -140,23 +118,6 @@ impl Vector2 {
         self.x *= scalar;
         self.y *= scalar;
     }
-
-    /**
-    Divide the x and y values of the vector by the scalar. This will scale up or down the vector.
-
-    ```
-    use nature_of_code_in_rust::utilities::vector2::Vector2;
-
-    let mut vector2 = Vector2::new(2.0, 4.0);
-    vector2.divide_scalar(2.0);
-    assert_eq!(vector2.x, 1.0);
-    assert_eq!(vector2.y, 2.0);
-    ```
-    */
-    pub fn divide_scalar(&mut self, scalar: f32) {
-        self.x /= scalar;
-        self.y /= scalar;
-    }
 }
 
 impl AddAssign for Vector2 {
@@ -175,42 +136,5 @@ impl AddAssign for Vector2 {
     fn add_assign(&mut self, rhs: Self) {
         self.x += rhs.x;
         self.y += rhs.y;
-    }
-}
-
-impl Sub for Vector2 {
-    type Output = Self;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        Self {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    /**
-    Translate the following pseudocode to code using static or non-static functions where appropriate.
-
-    The PVector v equals (1,5).
-
-    The PVector u equals v multiplied by 2.
-
-    The PVector w equals v minus u.
-
-    Divide the PVector w by 3.
-
-
-    */
-    #[test]
-    fn exercise_1_7() {
-        let v = Vector2::new(1.0, 5.0);
-        let u = Vector2::multiply_scalar_static(v, 2.0);
-        let mut w = v - u;
-        w.divide_scalar(3.0);
     }
 }
