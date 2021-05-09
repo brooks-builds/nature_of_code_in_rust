@@ -1,5 +1,5 @@
 [package]
-name = "nature_of_code_in_rust"
+name = "example_1_2"
 version = "0.1.0"
 authors = ["Brooks Patton <brooks@brookzerker.com>"]
 edition = "2018"
@@ -11,4 +11,3 @@ ggez = "0.5.1"
 noise = "0.7.0"
 eyre = "0.6.5"
 rand = "0.8.3"
-num = "0.4.0"
