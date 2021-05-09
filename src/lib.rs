@@ -1,47 +1,45 @@
+use eyre::Result;
 use ggez::event::EventHandler;
-use ggez::graphics::{self, Color, DrawMode, DrawParam, MeshBuilder};
-use ggez::{Context, GameResult};
-use noise::{NoiseFn, Perlin};
-use utilities::map;
+use ggez::graphics::{self, Color, BLACK};
+use ggez::{timer, Context, GameResult};
+use noise::Perlin;
+use walker::Walker;
 
 mod utilities;
+mod walker;
 
-pub struct MainState {}
+pub struct MainState {
+    background_color: Color,
+    walker: Walker,
+    noise: Perlin,
+}
 
 impl MainState {
-    pub fn new(context: &mut Context) -> GameResult<Self> {
-        let (width, height) = graphics::drawable_size(context);
-        let mut mesh_builder = MeshBuilder::new();
-
+    pub fn new(context: &mut Context) -> Result<Self> {
+        let background_color = BLACK;
+        let walker = Walker::new(context)?;
         let noise = Perlin::new();
-        let noise_incrementer = 0.01;
 
-        let mut xoff = 10_000.0;
-        for x in 0..width as u32 {
-            let mut yoff = 0.0;
-            for y in 0..height as u32 {
-                let brightness = map(noise.get([xoff, yoff]) as f32, -1.0, 1.0, 0.0, 1.0);
-                let color = Color::new(brightness, brightness, brightness, 1.0);
-                mesh_builder.circle(DrawMode::fill(), [x as f32, y as f32], 0.5, 0.1, color);
-                yoff += noise_incrementer;
-            }
-            xoff += noise_incrementer;
-        }
-
-        let mesh = mesh_builder.build(context)?;
-
-        graphics::draw(context, &mesh, DrawParam::new())?;
-        graphics::present(context)?;
-        Ok(Self {})
+        Ok(Self {
+            background_color,
+            walker,
+            noise,
+        })
     }
 }
 
 impl EventHandler for MainState {
-    fn update(&mut self, _context: &mut Context) -> GameResult {
+    fn update(&mut self, context: &mut Context) -> GameResult {
+        while timer::check_update_time(context, 60) {
+            let (screen_width, screen_height) = graphics::drawable_size(context);
+            self.walker.step(&self.noise, screen_width, screen_height);
+        }
         Ok(())
     }
 
-    fn draw(&mut self, _context: &mut Context) -> GameResult {
-        Ok(())
+    fn draw(&mut self, context: &mut Context) -> GameResult {
+        graphics::clear(context, self.background_color);
+        self.walker.draw(context).unwrap();
+        graphics::present(context)
     }
 }

@@ -589,13 +589,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "example_i_6"
+name = "example_i_5"
 version = "0.1.0"
 dependencies = [
  "eyre",
  "ggez",
  "noise",
- "rand 0.8.3",
 ]
 
 [[package]]
