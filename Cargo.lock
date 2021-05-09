@@ -589,7 +589,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "example_1_2"
+name = "exercise_i_9"
 version = "0.1.0"
 dependencies = [
  "eyre",

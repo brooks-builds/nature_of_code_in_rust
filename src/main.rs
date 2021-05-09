@@ -1,12 +1,12 @@
-use example_1_2::MainState;
+use exercise_i_9::MainState;
 use eyre::Result;
 use ggez::conf::{WindowMode, WindowSetup};
 use ggez::{event, ContextBuilder};
 
-const TITLE: &str = "Nature of Code in Rust: Example 1.2 - Bouncing Ball with vectors";
+const TITLE: &str = "Nature of Code in Rust: Exercise I.9";
 
 fn main() -> Result<()> {
-    let window_mode = WindowMode::default().dimensions(1920.0, 1080.0);
+    let window_mode = WindowMode::default().dimensions(200.0, 200.0);
     let window_setup = WindowSetup::default().title(TITLE);
     let (mut context, mut events_loop) = ContextBuilder::new(TITLE, "Brookzerker")
         .window_mode(window_mode)
