@@ -26,7 +26,6 @@ impl MainState {
 
 impl EventHandler for MainState {
     fn update(&mut self, context: &mut Context) -> GameResult {
-        self.mover.walk(context);
         self.mover.update();
         self.mover.check_edges(context);
         Ok(())
