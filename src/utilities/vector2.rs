@@ -1,4 +1,4 @@
-use num::{Float, Num};
+use num::Num;
 use std::ops::{Add, AddAssign, MulAssign, Sub, SubAssign};
 
 #[derive(Debug, Copy, Clone)]
@@ -21,19 +21,9 @@ where
         [self.x, self.y]
     }
 
-    #[allow(dead_code)]
     pub fn multiply_scalar(&mut self, scalar: T) {
         self.x *= scalar;
         self.y *= scalar;
-    }
-}
-
-impl<T> Vector2<T>
-where
-    T: Num + Float,
-{
-    pub fn magnitude(&self) -> T {
-        (self.x * self.x + self.y * self.y).sqrt()
     }
 }
 
