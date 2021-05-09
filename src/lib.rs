@@ -2,10 +2,10 @@ use ggez::event::EventHandler;
 use ggez::graphics::{self, Color, BLACK};
 use ggez::{Context, GameResult};
 use mover::Mover;
+use rand::{thread_rng, Rng};
 
 mod mover;
 mod utilities;
-
 pub struct MainState {
     background_color: Color,
     mover: Mover,
@@ -14,8 +14,13 @@ pub struct MainState {
 impl MainState {
     pub fn new(context: &mut Context) -> GameResult<Self> {
         let background_color = BLACK;
+        let mut rng = thread_rng();
         let (width, height) = graphics::drawable_size(context);
-        let mover = Mover::new(width / 2.0, height / 2.0, context)?;
+        let mover = Mover::new(
+            rng.gen_range(0.0..width),
+            rng.gen_range(0.0..height),
+            context,
+        )?;
 
         Ok(Self {
             background_color,

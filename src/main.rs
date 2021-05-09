@@ -1,10 +1,9 @@
-use example_1_8::MainState;
+use example_1_7::MainState;
 use eyre::Result;
 use ggez::conf::{WindowMode, WindowSetup};
 use ggez::{event, ContextBuilder};
 
-const TITLE: &str =
-    "Nature of Code in Rust: Example 1.8 - Motion 101 (velocity and constant acceleration)";
+const TITLE: &str = "Nature of Code in Rust: Example 1.7 - Motion 101 (velocity)";
 
 fn main() -> Result<()> {
     let window_mode = WindowMode::default().dimensions(1920.0, 1080.0);

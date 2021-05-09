@@ -1,60 +1,43 @@
-use ggez::graphics::{DrawMode, DrawParam, Mesh, MeshBuilder, WHITE};
-use ggez::{graphics, Context, GameResult};
+use ggez::graphics::{self, DrawMode, DrawParam, Mesh, MeshBuilder, WHITE};
+use ggez::{Context, GameError, GameResult};
+use rand::{thread_rng, Rng};
 
 use crate::utilities::vector2::Vector2;
 
-#[allow(dead_code)]
 pub struct Mover {
     location: Vector2<f32>,
     velocity: Vector2<f32>,
-    acceleration: Vector2<f32>,
-    mesh: Option<Mesh>,
-    topspeed: f32,
+    mesh: Mesh,
 }
 
-#[allow(dead_code)]
 impl Mover {
-    pub fn new(x: f32, y: f32, context: &mut Context) -> GameResult<Self> {
-        let location = Vector2::new(x, y);
-        let velocity = Vector2::new(0.0, 0.0);
-        let acceleration = Vector2::new(-0.001, 0.01);
-        let mesh = Some(
-            MeshBuilder::new()
-                .circle(DrawMode::fill(), [0.0, 0.0], 25.0, 0.1, WHITE)
-                .build(context)?,
-        );
-        let topspeed = 10.0;
-
+    pub fn new(x: f32, y: f32, context: &mut Context) -> Result<Self, GameError> {
+        let mut rng = thread_rng();
+        let velocity = Vector2::new(rng.gen_range(-2.0..2.0), rng.gen_range(-2.0..2.0));
+        let mesh = MeshBuilder::new()
+            .circle(DrawMode::fill(), [0.0, 0.0], 25.0, 0.1, WHITE)
+            .build(context)?;
         Ok(Self {
-            location,
+            location: Vector2::new(x, y),
             velocity,
-            acceleration,
             mesh,
-            topspeed,
         })
     }
 
+    pub fn display(&self, context: &mut Context) -> GameResult {
+        graphics::draw(
+            context,
+            &self.mesh,
+            DrawParam::default().dest(self.location.to_array()),
+        )
+    }
+
     pub fn update(&mut self) {
-        self.velocity += self.acceleration;
-        self.velocity.limit(self.topspeed);
         self.location += self.velocity;
     }
 
-    pub fn display(&self, context: &mut Context) -> GameResult {
-        if let Some(mesh) = &self.mesh {
-            graphics::draw(
-                context,
-                mesh,
-                DrawParam::default().dest(self.location.to_array()),
-            )?;
-        }
-
-        Ok(())
-    }
-
     pub fn check_edges(&mut self, context: &mut Context) {
-        let (screen_width, screen_height) = graphics::drawable_size(context);
-
+        let (screen_width, screen_heigth) = graphics::drawable_size(context);
         if self.location.x < 0.0 {
             self.location.x = screen_width;
         } else if self.location.x > screen_width {
@@ -62,8 +45,8 @@ impl Mover {
         }
 
         if self.location.y < 0.0 {
-            self.location.y = screen_height;
-        } else if self.location.y > screen_height {
+            self.location.y = screen_heigth;
+        } else if self.location.y > screen_heigth {
             self.location.y = 0.0;
         }
     }

@@ -1,7 +1,7 @@
 use num::{Float, Num};
 use std::ops::{Add, AddAssign, DivAssign, MulAssign, Sub, SubAssign};
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone)]
 pub struct Vector2<T> {
     pub x: T,
     pub y: T,
@@ -29,7 +29,7 @@ where
 #[allow(dead_code)]
 impl<T> Vector2<T>
 where
-    T: Num + Float + DivAssign + MulAssign,
+    T: Num + Float + DivAssign,
 {
     pub fn magnitude(&self) -> T {
         (self.x * self.x + self.y * self.y).sqrt()
@@ -39,13 +39,6 @@ where
         let magnitude = self.magnitude();
         self.x /= magnitude;
         self.y /= magnitude;
-    }
-
-    pub fn limit(&mut self, max: T) {
-        if self.magnitude() > max {
-            self.normalize();
-            self.multiply_scalar(max);
-        }
     }
 }
 
@@ -94,20 +87,5 @@ where
     fn sub_assign(&mut self, rhs: Self) {
         self.x -= rhs.x;
         self.y -= rhs.y;
-    }
-}
-
-#[cfg(test)]
-#[allow(clippy::float_cmp)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn should_be_able_to_limit_vectors() {
-        let mut velocity = Vector2::new(3.0, 4.0);
-        let acceleration = Vector2::new(1.0, 1.0);
-        velocity += acceleration;
-        velocity.limit(5.0);
-        assert_eq!(5.0, velocity.magnitude());
     }
 }
