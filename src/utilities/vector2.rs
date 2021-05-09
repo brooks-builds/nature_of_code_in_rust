@@ -1,57 +1,57 @@
-use num::Num;
-use std::ops::{Add, AddAssign, SubAssign};
+use std::ops::{AddAssign, DivAssign, MulAssign};
 
-#[derive(Debug, Copy, Clone)]
-pub struct Vector2<T> {
-    pub x: T,
-    pub y: T,
+#[derive(Debug, Clone, Copy, Default)]
+pub struct Vector2 {
+    pub x: f32,
+    pub y: f32,
 }
 
-impl<T> Vector2<T>
-where
-    T: Num + Copy,
-{
-    #[allow(dead_code)]
-    pub fn new(x: T, y: T) -> Self {
+impl Vector2 {
+    pub fn new(x: f32, y: f32) -> Self {
         Self { x, y }
     }
 
-    #[allow(dead_code)]
-    pub fn to_array(&self) -> [T; 2] {
-        [self.x, self.y]
+    pub fn reset(&mut self) {
+        *self = Self::default();
     }
-}
 
-impl<T> Add for Vector2<T>
-where
-    T: Num,
-{
-    type Output = Vector2<T>;
+    pub fn reverse(&mut self) {
+        *self *= -1.0;
+    }
 
-    fn add(self, rhs: Self) -> Self::Output {
-        Self {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
+    pub fn normalize(&mut self) {
+        *self /= self.magnitude();
+    }
+
+    pub fn magnitude(&self) -> f32 {
+        (self.x.powi(2) + self.y.powi(2)).sqrt()
+    }
+
+    pub fn as_mint_point2(&self) -> ggez::mint::Point2<f32> {
+        ggez::mint::Point2 {
+            x: self.x,
+            y: self.y,
         }
     }
 }
 
-impl<T> AddAssign for Vector2<T>
-where
-    T: Num + Copy + AddAssign,
-{
+impl AddAssign for Vector2 {
     fn add_assign(&mut self, rhs: Self) {
-        self.x = self.x + rhs.x;
+        self.x += rhs.x;
         self.y += rhs.y;
     }
 }
 
-impl<T> SubAssign for Vector2<T>
-where
-    T: Num + Copy + SubAssign,
-{
-    fn sub_assign(&mut self, rhs: Self) {
-        self.x -= rhs.x;
-        self.y -= rhs.y;
+impl DivAssign<f32> for Vector2 {
+    fn div_assign(&mut self, rhs: f32) {
+        self.x /= rhs;
+        self.y /= rhs;
+    }
+}
+
+impl MulAssign<f32> for Vector2 {
+    fn mul_assign(&mut self, rhs: f32) {
+        self.x *= rhs;
+        self.y *= rhs;
     }
 }

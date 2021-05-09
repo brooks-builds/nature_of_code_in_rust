@@ -1,57 +1,76 @@
 use ggez::event::EventHandler;
-use ggez::graphics::{self, Color, DrawParam, Mesh, MeshBuilder, BLACK, WHITE};
-use ggez::{input, Context, GameResult};
+use ggez::graphics::{self, Color, DrawParam, MeshBuilder, BLACK};
+use ggez::{timer, Context, GameResult};
+use mover::Mover;
 use utilities::vector2::Vector2;
 
+use crate::zone::Zone;
+
+mod mover;
 mod utilities;
+mod zone;
 
 pub struct MainState {
     background_color: Color,
-    mesh: Option<Mesh>,
+    mover: Mover,
+    zones: Vec<Zone>,
 }
 
 impl MainState {
-    pub fn new(_context: &mut Context) -> GameResult<Self> {
+    pub fn new(context: &mut Context) -> GameResult<Self> {
         let background_color = BLACK;
-        let mesh = None;
+        let (width, height) = graphics::drawable_size(context);
+        let mut mover = Mover::new(Vector2::new(0.0, height / 2.0), 25.0);
+        mover.apply_force(Vector2::new(3.2, 0.0));
+        let zones = vec![
+            Zone::new(
+                width / 2.0 - 500.0,
+                0.0,
+                500.0,
+                height,
+                Color::new(1.0, 0.0, 0.0, 0.3),
+                0.01,
+            ),
+            Zone::new(
+                width / 2.0,
+                0.0,
+                500.0,
+                height,
+                Color::new(0.0, 0.3, 0.7, 0.3),
+                -0.01,
+            ),
+        ];
 
         Ok(Self {
             background_color,
-            mesh,
+            mover,
+            zones,
         })
     }
 }
 
 impl EventHandler for MainState {
     fn update(&mut self, context: &mut Context) -> GameResult {
-        let mouse_position = input::mouse::position(context);
-        let mut mouse_location = Vector2::new(mouse_position.x, mouse_position.y);
-        let (width, height) = graphics::drawable_size(context);
-        let center_location = Vector2::new(width / 2.0, height / 2.0);
-
-        mouse_location -= center_location;
-        let points = [[0.0, 0.0], mouse_location.to_array()];
-
-        self.mesh = Some(
-            MeshBuilder::new()
-                .line(&points, 2.0, WHITE)?
-                .build(context)?,
-        );
+        let (width, _height) = graphics::drawable_size(context);
+        while timer::check_update_time(context, 60) {
+            for zone in &self.zones {
+                zone.apply_friction_to_mover(&mut self.mover);
+            }
+            self.mover.update();
+            self.mover.check_edges(width);
+        }
         Ok(())
     }
 
     fn draw(&mut self, context: &mut Context) -> GameResult {
         graphics::clear(context, self.background_color);
-
-        let (width, height) = graphics::drawable_size(context);
-        let transform = DrawParam::new()
-            .dest([width / 2.0, height / 2.0])
-            .to_matrix();
-        graphics::set_transform(context, transform);
-        if let Some(mesh) = &self.mesh {
-            graphics::draw(context, mesh, DrawParam::new())?;
+        let mut mesh_builder = MeshBuilder::new();
+        for zone in &self.zones {
+            zone.draw(&mut mesh_builder);
         }
-        graphics::apply_transformations(context)?;
+        self.mover.draw(&mut mesh_builder);
+        let mesh = mesh_builder.build(context)?;
+        graphics::draw(context, &mesh, DrawParam::new())?;
 
         graphics::present(context)
     }
