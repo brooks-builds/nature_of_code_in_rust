@@ -1,5 +1,5 @@
 use ggez::event::KeyCode;
-use ggez::graphics::{Color, DrawMode, DrawParam, Mesh, MeshBuilder, WHITE};
+use ggez::graphics::{DrawMode, DrawParam, Mesh, MeshBuilder, WHITE};
 use ggez::input::keyboard::is_key_pressed;
 use ggez::{graphics, Context, GameResult};
 
@@ -23,12 +23,10 @@ impl Mover {
         let location = Vector2::new(x, y);
         let velocity = Vector2::new(0.0, 0.0);
         let acceleration = Vector2::new(0.0, 0.0);
-        let radius = mass;
-        let color = Color::new(0.9, 0.9, 0.9, 0.5);
+        let radius = 25.0;
         let mesh = Some(
             MeshBuilder::new()
-                .circle(DrawMode::fill(), [0.0, 0.0], radius, 0.1, color)
-                .circle(DrawMode::stroke(2.0), [0.0, 0.0], radius, 0.1, WHITE)
+                .circle(DrawMode::fill(), [0.0, 0.0], radius, 0.1, WHITE)
                 .build(context)?,
         );
         let topspeed = 10.0;
@@ -66,18 +64,22 @@ impl Mover {
     }
 
     pub fn check_edges(&mut self, context: &mut Context) {
-        let (screen_width, screen_height) = graphics::drawable_size(context);
+        if self.location.y - self.radius < 0.0 {
+            self.location.y = self.radius;
+            let mut bounce_force = self.velocity;
+            bounce_force.y *= -1.0;
+            bounce_force.multiply_scalar(1.75);
+            self.apply_force(bounce_force);
+        }
 
-        let left_wall = Vector2::new(0.0, self.location.y);
-        let mut force = left_wall - self.location;
-        let distance = force.magnitude() * 0.0001;
-        force.normalize();
-        force.multiply_scalar(distance);
-        self.apply_force(&force);
+        let (screen_width, _screen_height) = graphics::drawable_size(context);
 
-        if self.location.y + self.radius > screen_height {
-            self.location.y = screen_height - self.radius;
-            self.velocity.y *= -1.0;
+        if self.location.x - self.radius < 0.0 {
+            self.location.x = self.radius;
+            self.velocity.x = 0.0;
+        } else if self.location.x + self.radius > screen_width {
+            self.location.x = screen_width - self.radius;
+            self.velocity.x = 0.0;
         }
     }
 
@@ -89,8 +91,8 @@ impl Mover {
         }
     }
 
-    pub fn apply_force(&mut self, force: &Vector2) {
-        let mut force = *force;
+    pub fn apply_force(&mut self, force: Vector2) {
+        let mut force = force;
         force.divide_scalar(self.mass);
         self.acceleration += force;
     }
