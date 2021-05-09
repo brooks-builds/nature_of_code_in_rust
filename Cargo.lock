@@ -589,6 +589,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "example_1_8"
+version = "0.1.0"
+dependencies = [
+ "eyre",
+ "ggez",
+ "noise",
+ "num",
+ "rand 0.8.3",
+]
+
+[[package]]
 name = "eyre"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1331,17 +1342,6 @@ dependencies = [
  "num-traits 0.2.14",
  "rand 0.6.5",
  "typenum",
-]
-
-[[package]]
-name = "nature_of_code_in_rust"
-version = "0.1.0"
-dependencies = [
- "eyre",
- "ggez",
- "noise",
- "num",
- "rand 0.8.3",
 ]
 
 [[package]]

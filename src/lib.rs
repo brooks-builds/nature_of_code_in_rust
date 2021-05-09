@@ -4,7 +4,7 @@ use ggez::{Context, GameResult};
 use mover::Mover;
 
 mod mover;
-pub mod utilities;
+mod utilities;
 
 pub struct MainState {
     background_color: Color,
