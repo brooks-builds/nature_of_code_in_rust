@@ -533,15 +533,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "example_i_4"
-version = "0.1.0"
-dependencies = [
- "ggez",
- "rand 0.8.3",
- "rand_distr",
-]
-
-[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1601,16 +1592,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rand_distr"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da9e8f32ad24fb80d07d2323a9a2ce8b30d68a62b8cb4df88119ff49a698f038"
-dependencies = [
- "num-traits 0.2.14",
- "rand 0.8.3",
-]
-
-[[package]]
 name = "rand_hc"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2113,6 +2094,14 @@ dependencies = [
  "redox_syscall 0.2.5",
  "remove_dir_all",
  "winapi",
+]
+
+[[package]]
+name = "template"
+version = "0.1.0"
+dependencies = [
+ "ggez",
+ "rand 0.8.3",
 ]
 
 [[package]]

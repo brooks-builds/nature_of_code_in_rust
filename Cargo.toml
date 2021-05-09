@@ -1,5 +1,5 @@
 [package]
-name = "example_i_4"
+name = "template"
 version = "0.1.0"
 authors = ["Brooks Patton <brooks@brookzerker.com>"]
 edition = "2018"
@@ -9,4 +9,3 @@ edition = "2018"
 [dependencies]
 ggez = "0.5.1"
 rand = "0.8.3"
-rand_distr = "0.4.0"
