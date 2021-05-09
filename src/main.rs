@@ -1,18 +1,12 @@
-use eyre::Result;
-use ggez::conf::{WindowMode, WindowSetup};
-use ggez::{event, ContextBuilder};
-use template::MainState;
+use exercise_1_1::MainState;
+use ggez::{event, ContextBuilder, GameResult};
 
-const TITLE: &str = "Nature of Code in Rust: ";
+fn main() -> GameResult {
+    let (context, event_loop) = &mut ContextBuilder::new("Exercise 1.1", "Brooks Builds")
+        .build()
+        .unwrap();
 
-fn main() -> Result<()> {
-    let window_mode = WindowMode::default().dimensions(1920.0, 1080.0);
-    let window_setup = WindowSetup::default().title(TITLE);
-    let (mut context, mut events_loop) = ContextBuilder::new(TITLE, "Brookzerker")
-        .window_mode(window_mode)
-        .window_setup(window_setup)
-        .build()?;
-    let mut main_state = MainState::new(&mut context)?;
-    event::run(&mut context, &mut events_loop, &mut main_state)?;
-    Ok(())
+    let mut main_state = MainState::new(context)?;
+
+    event::run(context, event_loop, &mut main_state)
 }

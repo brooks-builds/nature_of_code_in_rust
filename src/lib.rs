@@ -1,29 +1,29 @@
-use ggez::event::EventHandler;
-use ggez::graphics::{self, Color, BLACK};
-use ggez::{Context, GameResult};
+mod walker;
 
-mod mover;
-mod utilities;
+use ggez::event::EventHandler;
+use ggez::{graphics, Context, GameResult};
+use walker::Walker;
 
 pub struct MainState {
-    background_color: Color,
+    walker: Walker,
 }
 
 impl MainState {
-    pub fn new(_context: &mut Context) -> GameResult<Self> {
-        let background_color = BLACK;
-
-        Ok(Self { background_color })
+    pub fn new(context: &mut Context) -> GameResult<Self> {
+        let (width, height) = graphics::drawable_size(context);
+        let walker = Walker::new(width / 2.0, height / 2.0, context)?;
+        Ok(Self { walker })
     }
 }
 
 impl EventHandler for MainState {
-    fn update(&mut self, _context: &mut Context) -> GameResult {
+    fn update(&mut self, _context: &mut ggez::Context) -> ggez::GameResult {
+        self.walker.step();
         Ok(())
     }
 
-    fn draw(&mut self, context: &mut Context) -> GameResult {
-        graphics::clear(context, self.background_color);
+    fn draw(&mut self, context: &mut ggez::Context) -> ggez::GameResult {
+        self.walker.display(context)?;
         graphics::present(context)
     }
 }
