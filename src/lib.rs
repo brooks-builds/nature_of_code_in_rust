@@ -13,20 +13,19 @@ pub struct MainState {
     movers: Vec<Mover>,
     wind_force: Vector2,
     gravity_force: Vector2,
-    coefficient_of_friction: f32,
 }
 
 impl MainState {
     pub fn new(context: &mut Context) -> GameResult<Self> {
         let background_color = BLACK;
         let wind_force = Vector2::new(0.1, 0.0);
-        let gravity_force = Vector2::new(0.0, 0.3);
+        let gravity_force = Vector2::new(0.0, 1.0);
         let mut random = Random::new();
         let mut movers = vec![];
 
         for _ in 0..100 {
             let mass = random.range(1.0, 5.0);
-            let mover = Mover::new(0.0, 0.0, mass, context)?;
+            let mover = Mover::new(mass * 2.0, mass * 5.0, mass, context)?;
             movers.push(mover);
         }
 
@@ -35,7 +34,6 @@ impl MainState {
             movers,
             wind_force,
             gravity_force,
-            coefficient_of_friction: 0.04,
         })
     }
 }
@@ -45,21 +43,11 @@ impl EventHandler for MainState {
         let wind_force = &self.wind_force;
 
         let gravity_force = self.gravity_force;
-        let coefficient_of_friction = self.coefficient_of_friction;
         self.movers.iter_mut().for_each(|mover| {
             let mut gravity_force = gravity_force;
-            let mut friction = mover.velocity;
-
-            friction *= -1.0;
-            friction.normalize();
-            friction *= coefficient_of_friction;
-
             gravity_force *= mover.mass;
-
             mover.apply_force(wind_force);
             mover.apply_force(&gravity_force);
-            mover.apply_force(&friction);
-
             mover.update();
             mover.check_edges(context);
         });

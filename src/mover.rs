@@ -8,7 +8,7 @@ use crate::utilities::vector2::Vector2;
 #[allow(dead_code)]
 pub struct Mover {
     location: Vector2,
-    pub velocity: Vector2,
+    velocity: Vector2,
     acceleration: Vector2,
     mesh: Option<Mesh>,
     topspeed: f32,
@@ -31,7 +31,7 @@ impl Mover {
                 .circle(DrawMode::stroke(2.0), [0.0, 0.0], radius, 0.1, WHITE)
                 .build(context)?,
         );
-        let topspeed = 100.0;
+        let topspeed = 10.0;
         let scale = 0.5;
 
         Ok(Self {
