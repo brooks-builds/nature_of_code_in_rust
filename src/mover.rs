@@ -1,5 +1,5 @@
 use ggez::event::KeyCode;
-use ggez::graphics::{Color, DrawMode, DrawParam, Mesh, MeshBuilder, WHITE};
+use ggez::graphics::{DrawMode, DrawParam, Mesh, MeshBuilder, WHITE};
 use ggez::input::keyboard::is_key_pressed;
 use ggez::{graphics, Context, GameResult};
 
@@ -23,12 +23,10 @@ impl Mover {
         let location = Vector2::new(x, y);
         let velocity = Vector2::new(0.0, 0.0);
         let acceleration = Vector2::new(0.0, 0.0);
-        let radius = mass;
-        let color = Color::new(0.9, 0.9, 0.9, 0.5);
+        let radius = 25.0;
         let mesh = Some(
             MeshBuilder::new()
-                .circle(DrawMode::fill(), [0.0, 0.0], radius, 0.1, color)
-                .circle(DrawMode::stroke(2.0), [0.0, 0.0], radius, 0.1, WHITE)
+                .circle(DrawMode::fill(), [0.0, 0.0], radius, 0.1, WHITE)
                 .build(context)?,
         );
         let topspeed = 10.0;
@@ -87,8 +85,8 @@ impl Mover {
         }
     }
 
-    pub fn apply_force(&mut self, force: &Vector2) {
-        let mut force = *force;
+    pub fn apply_force(&mut self, force: Vector2) {
+        let mut force = force;
         force.divide_scalar(self.mass);
         self.acceleration += force;
     }
