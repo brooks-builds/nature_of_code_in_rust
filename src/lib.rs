@@ -24,8 +24,8 @@ impl MainState {
         let mut movers = vec![];
 
         for _ in 0..100 {
-            let mass = random.range(1.0, 5.0);
-            let mover = Mover::new(mass * 2.0, mass * 5.0, mass, context)?;
+            let mass = random.range(10.0, 35.0);
+            let mover = Mover::new(mass * 2.0, mass * 2.0, mass, context)?;
             movers.push(mover);
         }
 
@@ -41,13 +41,11 @@ impl MainState {
 impl EventHandler for MainState {
     fn update(&mut self, context: &mut Context) -> GameResult {
         let wind_force = &self.wind_force;
+        let gravity_force = &self.gravity_force;
 
-        let gravity_force = self.gravity_force;
         self.movers.iter_mut().for_each(|mover| {
-            let mut gravity_force = gravity_force;
-            gravity_force *= mover.mass;
             mover.apply_force(wind_force);
-            mover.apply_force(&gravity_force);
+            mover.apply_force(gravity_force);
             mover.update();
             mover.check_edges(context);
         });

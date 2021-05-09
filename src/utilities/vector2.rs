@@ -1,4 +1,4 @@
-use std::ops::{AddAssign, Mul, MulAssign, Sub};
+use std::ops::{AddAssign, Sub};
 
 use num::Zero;
 use rand::random;
@@ -46,7 +46,7 @@ impl Vector2 {
     */
     pub fn multiply_scalar_static(vector2: Self, scalar: f32) -> Self {
         let mut vector2 = vector2;
-        vector2 *= scalar;
+        vector2.multiply_scalar(scalar);
         vector2
     }
 
@@ -83,7 +83,7 @@ impl Vector2 {
     pub fn limit(&mut self, max: f32) {
         if self.magnitude() > max {
             self.normalize();
-            *self *= max;
+            self.multiply_scalar(max);
         }
     }
 
@@ -122,6 +122,23 @@ impl Vector2 {
         }
         self.x /= magnitude;
         self.y /= magnitude;
+    }
+
+    /**
+    Multiply the x and y values of the vector by the scalar. This will scale up or down the vector.
+
+    ```
+    use nature_of_code_in_rust::utilities::vector2::Vector2;
+
+    let mut vector2 = Vector2::new(1.0, 2.0);
+    vector2.multiply_scalar(2.0);
+    assert_eq!(vector2.x, 2.0);
+    assert_eq!(vector2.y, 4.0);
+    ```
+    */
+    pub fn multiply_scalar(&mut self, scalar: f32) {
+        self.x *= scalar;
+        self.y *= scalar;
     }
 
     /**
@@ -169,24 +186,6 @@ impl Sub for Vector2 {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
         }
-    }
-}
-
-impl Mul<f32> for Vector2 {
-    type Output = Self;
-
-    fn mul(self, rhs: f32) -> Self::Output {
-        Self {
-            x: self.x * rhs,
-            y: self.y * rhs,
-        }
-    }
-}
-
-impl MulAssign<f32> for Vector2 {
-    fn mul_assign(&mut self, rhs: f32) {
-        self.x *= rhs;
-        self.y *= rhs;
     }
 }
 

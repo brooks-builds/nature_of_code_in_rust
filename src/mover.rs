@@ -14,7 +14,7 @@ pub struct Mover {
     topspeed: f32,
     scale: f32,
     radius: f32,
-    pub mass: f32,
+    mass: f32,
 }
 
 #[allow(dead_code)]
@@ -23,7 +23,7 @@ impl Mover {
         let location = Vector2::new(x, y);
         let velocity = Vector2::new(0.0, 0.0);
         let acceleration = Vector2::new(0.0, 0.0);
-        let radius = mass * 10.0;
+        let radius = mass;
         let color = Color::new(0.9, 0.9, 0.9, 0.5);
         let mesh = Some(
             MeshBuilder::new()
@@ -50,7 +50,7 @@ impl Mover {
         self.velocity += self.acceleration;
         self.velocity.limit(self.topspeed);
         self.location += self.velocity;
-        self.acceleration *= 0.0;
+        self.acceleration.multiply_scalar(0.0);
     }
 
     pub fn display(&self, context: &mut Context) -> GameResult {
