@@ -1,13 +1,18 @@
-use ggez::{event, ContextBuilder, GameResult};
-use i_1_traditional_random_walk::MainState;
+use eyre::Result;
+use ggez::conf::{WindowMode, WindowSetup};
+use ggez::{event, ContextBuilder};
+use nature_of_code_in_rust::MainState;
 
-fn main() -> GameResult {
-    let (context, event_loop) =
-        &mut ContextBuilder::new("Traditional Random Walk", "Brooks Builds")
-            .build()
-            .unwrap();
+const TITLE: &str = "Nature of Code in Rust";
 
-    let mut main_state = MainState::new(context)?;
-
-    event::run(context, event_loop, &mut main_state)
+fn main() -> Result<()> {
+    let window_mode = WindowMode::default().dimensions(1920.0, 1080.0);
+    let window_setup = WindowSetup::default().title(TITLE);
+    let (mut context, mut events_loop) = ContextBuilder::new(TITLE, "Brookzerker")
+        .window_mode(window_mode)
+        .window_setup(window_setup)
+        .build()?;
+    let mut main_state = MainState::new(&mut context)?;
+    event::run(&mut context, &mut events_loop, &mut main_state)?;
+    Ok(())
 }
