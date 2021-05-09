@@ -4,7 +4,7 @@ use ggez::{Context, GameResult};
 use mover::Mover;
 
 mod mover;
-pub mod utilities;
+mod utilities;
 
 pub struct MainState {
     background_color: Color,
@@ -26,6 +26,7 @@ impl MainState {
 
 impl EventHandler for MainState {
     fn update(&mut self, context: &mut Context) -> GameResult {
+        self.mover.handle_input(context);
         self.mover.update();
         self.mover.check_edges(context);
         Ok(())
