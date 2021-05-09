@@ -14,12 +14,11 @@ pub struct Mover {
     topspeed: f32,
     scale: f32,
     radius: f32,
-    mass: f32,
 }
 
 #[allow(dead_code)]
 impl Mover {
-    pub fn new(x: f32, y: f32, mass: f32, context: &mut Context) -> GameResult<Self> {
+    pub fn new(x: f32, y: f32, context: &mut Context) -> GameResult<Self> {
         let location = Vector2::new(x, y);
         let velocity = Vector2::new(0.0, 0.0);
         let acceleration = Vector2::new(0.0, 0.0);
@@ -40,7 +39,6 @@ impl Mover {
             topspeed,
             scale,
             radius,
-            mass,
         })
     }
 
@@ -92,8 +90,6 @@ impl Mover {
     }
 
     pub fn apply_force(&mut self, force: Vector2) {
-        let mut force = force;
-        force.divide_scalar(self.mass);
         self.acceleration += force;
     }
 }

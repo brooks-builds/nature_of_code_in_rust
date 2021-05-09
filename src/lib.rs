@@ -22,7 +22,7 @@ impl MainState {
     pub fn new(context: &mut Context) -> GameResult<Self> {
         let background_color = BLACK;
         let (width, height) = graphics::drawable_size(context);
-        let mover = Mover::new(width / 2.0, height / 2.0, 10.0, context)?;
+        let mover = Mover::new(width / 2.0, height / 2.0, context)?;
         let up_force = Vector2::new(0.0, -0.5);
         let noise = Perlin::new();
         let x_off = 0.0;
