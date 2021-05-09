@@ -1,9 +1,9 @@
-use example_1_4::MainState;
+use example_1_3::MainState;
 use eyre::Result;
 use ggez::conf::{WindowMode, WindowSetup};
 use ggez::{event, ContextBuilder};
 
-const TITLE: &str = "Nature of Code in Rust: Example 1.4 - Multiplying a vector";
+const TITLE: &str = "Nature of Code in Rust: Example 1.3 - Vector Subtraction";
 
 fn main() -> Result<()> {
     let window_mode = WindowMode::default().dimensions(1920.0, 1080.0);

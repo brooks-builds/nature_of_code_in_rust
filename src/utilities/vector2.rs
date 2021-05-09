@@ -1,5 +1,5 @@
 use num::Num;
-use std::ops::{Add, AddAssign, MulAssign, Sub, SubAssign};
+use std::ops::{Add, AddAssign, SubAssign};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vector2<T> {
@@ -9,7 +9,7 @@ pub struct Vector2<T> {
 
 impl<T> Vector2<T>
 where
-    T: Num + Copy + MulAssign,
+    T: Num + Copy,
 {
     #[allow(dead_code)]
     pub fn new(x: T, y: T) -> Self {
@@ -19,11 +19,6 @@ where
     #[allow(dead_code)]
     pub fn to_array(&self) -> [T; 2] {
         [self.x, self.y]
-    }
-
-    pub fn multiply_scalar(&mut self, scalar: T) {
-        self.x *= scalar;
-        self.y *= scalar;
     }
 }
 
@@ -48,20 +43,6 @@ where
     fn add_assign(&mut self, rhs: Self) {
         self.x = self.x + rhs.x;
         self.y += rhs.y;
-    }
-}
-
-impl<T> Sub for Vector2<T>
-where
-    T: Num,
-{
-    type Output = Vector2<T>;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        Self {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-        }
     }
 }
 
