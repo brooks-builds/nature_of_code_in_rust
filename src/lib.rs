@@ -1,66 +1,70 @@
 use ggez::event::EventHandler;
-use ggez::graphics::{self, Color, DrawMode, DrawParam, Mesh, MeshBuilder, BLACK, WHITE};
+use ggez::graphics::{self, DrawMode, DrawParam, Mesh, MeshBuilder, WHITE};
+use ggez::input::mouse;
 use ggez::mint::Point2;
 use ggez::{Context, GameResult};
-use rand::prelude::ThreadRng;
-use rand::thread_rng;
-use rand_distr::{Distribution, Normal};
 
 pub struct MainState {
-    locations: Vec<Point2<f32>>,
-    colors: Vec<Color>,
-    circle: Mesh,
-    location_rng: Normal<f32>,
-    color_rng: Normal<f32>,
-    rng: ThreadRng,
+    x: f32,
+    y: f32,
+    mesh: Mesh,
 }
 
 impl MainState {
     pub fn new(context: &mut Context) -> GameResult<Self> {
-        let circle = MeshBuilder::new()
-            .circle(DrawMode::fill(), Point2 { x: 0.0, y: 0.0 }, 5.0, 0.1, WHITE)
+        let (width, height) = graphics::drawable_size(context);
+        let x = width / 2.0;
+        let y = height / 2.0;
+        let mesh = MeshBuilder::new()
+            .circle(DrawMode::fill(), Point2 { x: 0.0, y: 0.0 }, 1.0, 0.1, WHITE)
             .build(context)?;
-        let location_rng = Normal::new(500.0, 250.0).unwrap();
-        let color_rng = Normal::new(200.0, 20.0).unwrap();
-        let rng = thread_rng();
-        let locations = vec![];
-        let colors = vec![];
-        Ok(Self {
-            locations,
-            colors,
-            circle,
-            location_rng,
-            color_rng,
-            rng,
-        })
+
+        Ok(Self { x, y, mesh })
+    }
+
+    fn move_towards_mouse(&mut self, context: &mut Context) {
+        let mouse_position = mouse::position(context);
+
+        if self.x < mouse_position.x {
+            self.x += 1.0;
+        } else if self.x > mouse_position.x {
+            self.x -= 1.0;
+        }
+
+        if self.y < mouse_position.y {
+            self.y += 1.0;
+        } else if self.y > mouse_position.y {
+            self.y -= 1.0;
+        }
+    }
+
+    fn randomly_move(&mut self) {
+        let random_number = rand::random::<f32>();
+
+        if random_number < 0.25 {
+            self.y -= 1.0;
+        } else if random_number < 0.5 {
+            self.y += 1.0;
+        } else if random_number < 0.75 {
+            self.x += 1.0;
+        } else {
+            self.x -= 1.0;
+        }
     }
 }
 
 impl EventHandler for MainState {
-    fn update(&mut self, _context: &mut Context) -> GameResult {
-        let point = Point2 {
-            x: self.location_rng.sample(&mut self.rng),
-            y: self.location_rng.sample(&mut self.rng),
-        };
-        self.locations.push(point);
-        let color = Color::from_rgb(
-            self.color_rng.sample(&mut self.rng) as u8,
-            self.color_rng.sample(&mut self.rng) as u8,
-            self.color_rng.sample(&mut self.rng) as u8,
-        );
-        self.colors.push(color);
+    fn update(&mut self, context: &mut Context) -> GameResult {
+        if rand::random::<f32>() < 0.5 {
+            self.move_towards_mouse(context);
+        } else {
+            self.randomly_move();
+        }
         Ok(())
     }
 
     fn draw(&mut self, context: &mut Context) -> GameResult {
-        graphics::clear(context, BLACK);
-        for (index, location) in self.locations.iter().enumerate() {
-            graphics::draw(
-                context,
-                &self.circle,
-                DrawParam::new().dest(*location).color(self.colors[index]),
-            )?;
-        }
+        graphics::draw(context, &self.mesh, DrawParam::new().dest([self.x, self.y]))?;
         graphics::present(context)
     }
 }
