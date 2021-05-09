@@ -533,7 +533,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "exercise_i_5"
+name = "exercise_i_4"
 version = "0.1.0"
 dependencies = [
  "ggez",

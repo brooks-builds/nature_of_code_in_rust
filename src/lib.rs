@@ -1,5 +1,5 @@
 use ggez::event::EventHandler;
-use ggez::graphics::{self, Color, DrawParam, Mesh, MeshBuilder, BLACK, WHITE};
+use ggez::graphics::{self, Color, DrawMode, DrawParam, Mesh, MeshBuilder, BLACK, WHITE};
 use ggez::mint::Point2;
 use ggez::{Context, GameResult};
 use rand::prelude::ThreadRng;
@@ -7,56 +7,59 @@ use rand::thread_rng;
 use rand_distr::{Distribution, Normal};
 
 pub struct MainState {
-    background_color: Color,
-    steps: Vec<Point2<f32>>,
+    locations: Vec<Point2<f32>>,
+    colors: Vec<Color>,
+    circle: Mesh,
+    location_rng: Normal<f32>,
+    color_rng: Normal<f32>,
     rng: ThreadRng,
-    step_rng: Normal<f32>,
-    mesh: Option<Mesh>,
 }
 
 impl MainState {
     pub fn new(context: &mut Context) -> GameResult<Self> {
-        let background_color = BLACK;
-        let mut steps = vec![];
-        let (width, height) = graphics::drawable_size(context);
-        let x = width / 2.0;
-        let y = height / 2.0;
-        steps.push(Point2 { x, y });
+        let circle = MeshBuilder::new()
+            .circle(DrawMode::fill(), Point2 { x: 0.0, y: 0.0 }, 5.0, 0.1, WHITE)
+            .build(context)?;
+        let location_rng = Normal::new(500.0, 250.0).unwrap();
+        let color_rng = Normal::new(200.0, 20.0).unwrap();
         let rng = thread_rng();
-        let step_rng = Normal::new(0.0, 10.0).unwrap();
-        let mesh = None;
-
+        let locations = vec![];
+        let colors = vec![];
         Ok(Self {
-            background_color,
-            steps,
+            locations,
+            colors,
+            circle,
+            location_rng,
+            color_rng,
             rng,
-            step_rng,
-            mesh,
         })
     }
 }
 
 impl EventHandler for MainState {
-    fn update(&mut self, context: &mut Context) -> GameResult {
-        let last_location = self.steps.last().unwrap();
-        let next_x = self.step_rng.sample(&mut self.rng) + last_location.x;
-        let next_y = self.step_rng.sample(&mut self.rng) + last_location.y;
-        self.steps.push(Point2 {
-            x: next_x,
-            y: next_y,
-        });
-        self.mesh = Some(
-            MeshBuilder::new()
-                .line(&self.steps, 2.0, WHITE)?
-                .build(context)?,
+    fn update(&mut self, _context: &mut Context) -> GameResult {
+        let point = Point2 {
+            x: self.location_rng.sample(&mut self.rng),
+            y: self.location_rng.sample(&mut self.rng),
+        };
+        self.locations.push(point);
+        let color = Color::from_rgb(
+            self.color_rng.sample(&mut self.rng) as u8,
+            self.color_rng.sample(&mut self.rng) as u8,
+            self.color_rng.sample(&mut self.rng) as u8,
         );
+        self.colors.push(color);
         Ok(())
     }
 
     fn draw(&mut self, context: &mut Context) -> GameResult {
-        graphics::clear(context, self.background_color);
-        if let Some(mesh) = &self.mesh {
-            graphics::draw(context, mesh, DrawParam::new())?;
+        graphics::clear(context, BLACK);
+        for (index, location) in self.locations.iter().enumerate() {
+            graphics::draw(
+                context,
+                &self.circle,
+                DrawParam::new().dest(*location).color(self.colors[index]),
+            )?;
         }
         graphics::present(context)
     }
