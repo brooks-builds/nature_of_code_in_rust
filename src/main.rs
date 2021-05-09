@@ -1,9 +1,9 @@
-use example_1_1::MainState;
 use eyre::Result;
 use ggez::conf::{WindowMode, WindowSetup};
 use ggez::{event, ContextBuilder};
+use nature_of_code_in_rust::MainState;
 
-const TITLE: &str = "Nature of Code in Rust: Example 1.1 - Bouncing Ball with no vectors";
+const TITLE: &str = "Nature of Code in Rust";
 
 fn main() -> Result<()> {
     let window_mode = WindowMode::default().dimensions(1920.0, 1080.0);
