@@ -2,73 +2,77 @@ use ggez::event::EventHandler;
 use ggez::graphics::{self, Color, DrawParam, MeshBuilder, BLACK};
 use ggez::{timer, Context, GameResult};
 use mover::Mover;
+use rand::{thread_rng, Rng};
 use utilities::vector2::Vector2;
-
-use crate::zone::Zone;
+use zone::Zone;
 
 mod mover;
 mod utilities;
 mod zone;
 
 pub struct MainState {
-    background_color: Color,
-    mover: Mover,
-    zones: Vec<Zone>,
+    movers: Vec<Mover>,
+    gravity: Vector2,
+    water: Zone,
 }
 
 impl MainState {
     pub fn new(context: &mut Context) -> GameResult<Self> {
-        let background_color = BLACK;
+        let mut rng = thread_rng();
         let (width, height) = graphics::drawable_size(context);
-        let mut mover = Mover::new(Vector2::new(0.0, height / 2.0), 25.0);
-        mover.apply_force(Vector2::new(3.2, 0.0));
-        let zones = vec![
-            Zone::new(
-                width / 2.0 - 500.0,
-                0.0,
-                500.0,
-                height,
-                Color::new(1.0, 0.0, 0.0, 0.3),
-                0.01,
-            ),
-            Zone::new(
-                width / 2.0,
-                0.0,
-                500.0,
-                height,
-                Color::new(0.0, 0.3, 0.7, 0.3),
-                -0.01,
-            ),
-        ];
+        let space_between = width / 10.0;
+        let mut movers = vec![];
+        let gravity = Vector2::new(0.0, 0.1);
+        let water = Zone::new(
+            0.0,
+            height / 2.0,
+            width,
+            height / 2.0,
+            Color::new(0.0, 0.0, 1.0, 0.3),
+            0.5,
+        );
 
+        for count in 1..=10 {
+            let mass = rng.gen_range(5.0..30.0);
+            let mover = Mover::new(
+                Vector2::new(count as f32 * space_between + mass, 30.0),
+                mass,
+            );
+            movers.push(mover);
+        }
         Ok(Self {
-            background_color,
-            mover,
-            zones,
+            movers,
+            gravity,
+            water,
         })
     }
 }
 
 impl EventHandler for MainState {
     fn update(&mut self, context: &mut Context) -> GameResult {
-        let (width, _height) = graphics::drawable_size(context);
+        let drawable_size = graphics::drawable_size(context);
         while timer::check_update_time(context, 60) {
-            for zone in &self.zones {
-                zone.apply_friction_to_mover(&mut self.mover);
+            for mover in &mut self.movers {
+                let mut gravity = self.gravity;
+                gravity *= mover.mass;
+                mover.apply_force(gravity);
+                if mover.is_inside_zone(&self.water) {
+                    mover.apply_drag(&self.water);
+                }
+                mover.update();
+                mover.check_edges(drawable_size);
             }
-            self.mover.update();
-            self.mover.check_edges(width);
         }
         Ok(())
     }
 
     fn draw(&mut self, context: &mut Context) -> GameResult {
-        graphics::clear(context, self.background_color);
+        graphics::clear(context, BLACK);
         let mut mesh_builder = MeshBuilder::new();
-        for zone in &self.zones {
-            zone.draw(&mut mesh_builder);
+        for mover in &self.movers {
+            mover.draw(&mut mesh_builder);
         }
-        self.mover.draw(&mut mesh_builder);
+        self.water.draw(&mut mesh_builder);
         let mesh = mesh_builder.build(context)?;
         graphics::draw(context, &mesh, DrawParam::new())?;
 

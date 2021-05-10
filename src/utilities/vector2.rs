@@ -1,4 +1,4 @@
-use std::ops::{AddAssign, DivAssign, MulAssign};
+use std::ops::{AddAssign, Div, DivAssign, Mul, MulAssign};
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Vector2 {
@@ -6,6 +6,7 @@ pub struct Vector2 {
     pub y: f32,
 }
 
+#[allow(dead_code)]
 impl Vector2 {
     pub fn new(x: f32, y: f32) -> Self {
         Self { x, y }
@@ -53,5 +54,38 @@ impl MulAssign<f32> for Vector2 {
     fn mul_assign(&mut self, rhs: f32) {
         self.x *= rhs;
         self.y *= rhs;
+    }
+}
+
+impl Div<f32> for Vector2 {
+    type Output = Self;
+
+    fn div(self, rhs: f32) -> Self::Output {
+        Self {
+            x: self.x / rhs,
+            y: self.y / rhs,
+        }
+    }
+}
+
+impl Mul for Vector2 {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+        }
+    }
+}
+
+impl Mul<f32> for Vector2 {
+    type Output = Self;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+        }
     }
 }
