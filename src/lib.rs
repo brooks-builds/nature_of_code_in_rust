@@ -35,7 +35,10 @@ impl MainState {
         for count in 1..=10 {
             let mass = rng.gen_range(5.0..30.0);
             let mover = Mover::new(
-                Vector2::new(count as f32 * space_between + mass, 30.0),
+                Vector2::new(
+                    count as f32 * space_between + mass,
+                    rng.gen_range(30.0..(height / 2.0 - 30.0)),
+                ),
                 mass,
             );
             movers.push(mover);
