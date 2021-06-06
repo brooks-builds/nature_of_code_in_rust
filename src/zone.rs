@@ -25,8 +25,8 @@ impl Zone {
             y,
             width,
             height,
-            coefficient_of_drag,
             color,
+            coefficient_of_drag,
         }
     }
 

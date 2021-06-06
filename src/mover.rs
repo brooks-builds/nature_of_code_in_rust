@@ -1,3 +1,4 @@
+use ggez::graphics::Rect;
 use ggez::graphics::{Color, DrawMode, MeshBuilder, WHITE};
 
 use crate::utilities::vector2::Vector2;
@@ -6,7 +7,8 @@ use crate::zone::Zone;
 #[allow(dead_code)]
 pub struct Mover {
     pub location: Vector2,
-    radius: f32,
+    width: f32,
+    height: f32,
     color: Color,
     acceleration: Vector2,
     pub velocity: Vector2,
@@ -19,26 +21,24 @@ impl Mover {
         let color = WHITE;
         let velocity = Vector2::default();
         let acceleration = Vector2::default();
-        let radius = mass;
+        let width = mass * 2.0;
+        let height = 10.0;
 
         Self {
             location,
-            radius,
+            width,
+            height,
             color,
-            velocity,
             acceleration,
+            velocity,
             mass,
         }
     }
 
     pub fn draw(&self, mesh_builder: &mut MeshBuilder) {
-        mesh_builder.circle(
-            DrawMode::fill(),
-            self.location.as_mint_point2(),
-            self.radius,
-            0.1,
-            self.color,
-        );
+        let bounds = Rect::new(self.location.x, self.location.y, self.width, self.height);
+
+        mesh_builder.rectangle(DrawMode::fill(), bounds, WHITE);
     }
 
     pub fn update(&mut self) {
@@ -52,23 +52,22 @@ impl Mover {
     }
 
     pub fn check_edges(&mut self, (_screen_width, screen_height): (f32, f32)) {
-        if self.location.y + self.radius > screen_height {
-            self.location.y = screen_height - self.radius;
+        if self.location.y + self.height > screen_height {
+            self.location.y = screen_height - self.height;
             self.velocity.y *= -1.0;
         }
     }
 
     pub fn is_inside_zone(&self, zone: &Zone) -> bool {
-        self.location.y + self.radius > zone.y
+        self.location.y + self.height > zone.y
     }
 
     pub fn apply_drag(&mut self, zone: &Zone) {
-        let speed = self.velocity.magnitude();
-        let drag_speed = speed.powi(2) * zone.coefficient_of_drag;
+        let drag = self.velocity.magnitude().powi(2) * self.width * zone.coefficient_of_drag;
         let mut drag_force = self.velocity;
-        drag_force.reverse();
         drag_force.normalize();
-        drag_force *= drag_speed;
-        self.apply_force(drag_force);
+        drag_force.reverse();
+        drag_force *= drag;
+        self.acceleration += drag_force;
     }
 }
