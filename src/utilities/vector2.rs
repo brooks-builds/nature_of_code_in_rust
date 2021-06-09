@@ -1,5 +1,7 @@
 use std::ops::{AddAssign, Div, DivAssign, Mul, MulAssign};
 
+use num::Zero;
+
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Vector2 {
     pub x: f32,
@@ -21,7 +23,10 @@ impl Vector2 {
     }
 
     pub fn normalize(&mut self) {
-        *self /= self.magnitude();
+        let magnitude = self.magnitude();
+        if !magnitude.is_zero() {
+            *self /= self.magnitude();
+        }
     }
 
     pub fn magnitude(&self) -> f32 {
@@ -32,6 +37,20 @@ impl Vector2 {
         ggez::mint::Point2 {
             x: self.x,
             y: self.y,
+        }
+    }
+
+    pub fn perpendicular_left(&self) -> Self {
+        Self {
+            x: self.y,
+            y: -self.x,
+        }
+    }
+
+    pub fn perpendicular_right(&self) -> Self {
+        Self {
+            x: -self.y,
+            y: self.x,
         }
     }
 }
